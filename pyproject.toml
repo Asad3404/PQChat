@@ -1,0 +1,99 @@
+[build-system]
+requires = ["hatchling==1.33.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pqchat"
+version = "0.0.1"
+description = "PQ-Chat: hybrid post-quantum end-to-end encrypted messenger (MS Cybersecurity capstone)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "MIT" }
+# Runtime dependencies (PROJECT-BRIEF.md §6). Exact pins: the same versions must be used for
+# tests, Docker images and benchmarks so results are reproducible.
+# Transitive dependencies are pinned in requirements/constraints.txt.
+dependencies = [
+    "liboqs-python==0.16.0.2",   # ML-KEM-768, ML-DSA-65 (needs liboqs 0.16.0 C library)
+    "cryptography==50.0.2",      # X25519, Ed25519, HKDF, HMAC, AES-256-GCM
+    "argon2-cffi==25.1.0",       # Argon2id for the key store
+    "fastapi==0.162.0",          # relay server
+    "uvicorn==0.54.0",           # ASGI server for the relay
+    "websockets==17.4",          # WebSocket transport (used by uvicorn and the client)
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==9.2.0",
+    "hypothesis==6.170.14",
+    "pytest-benchmark==5.3.1",
+    "pytest-cov==7.1.0",
+    "ruff==0.17.3",
+    "mypy==2.4.1",
+    "bandit==1.9.4",
+    "pip-audit==2.10.1",
+    "pre-commit==4.7.0",
+]
+# Semgrep is installed separately (see CI and README) because it pins many of its own
+# dependencies and would otherwise conflict with the runtime set.
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pqchat"]
+
+# --------------------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+markers = [
+    "integration: needs running services (Docker Compose)",
+]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["pqchat"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+# --------------------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+extend-exclude = [".semgrep"]   # contains deliberately insecure rule-test code
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F",   # pycodestyle, pyflakes
+    "I",             # isort
+    "B",             # bugbear
+    "UP",            # pyupgrade
+    "S",             # flake8-bandit (security)
+    "N",             # naming
+    "SIM",           # simplify
+    "RUF",
+    "T20",           # no stray print(): a common way secrets leak (PROJECT-BRIEF.md §3.4)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101"]   # assert is how pytest works
+
+# --------------------------------------------------------------------------- mypy
+# The brief requires strict mode for crypto/ and protocol/. We apply it to the whole
+# package: being stricter everywhere costs little and catches more bugs.
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+mypy_path = "src"
+packages = ["pqchat"]
+
+[[tool.mypy.overrides]]
+module = ["oqs", "oqs.*"]
+ignore_missing_imports = true   # liboqs-python ships no type stubs
+
+# --------------------------------------------------------------------------- bandit
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
