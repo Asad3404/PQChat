@@ -1,0 +1,55 @@
+# Project-specific Semgrep rules: PROJECT-BRIEF.md §3 security rules turned into machine checks.
+# CI runs these together with the public p/python and p/security-audit rulesets.
+rules:
+  - id: pqchat-no-random-module
+    message: >-
+      The `random` module is not a CSPRNG. Use `secrets`, `os.urandom`, or the crypto
+      libraries (PROJECT-BRIEF.md §3.2).
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: import random
+      - pattern: from random import $X
+
+  - id: pqchat-no-unsafe-deserialisation
+    message: Never deserialise untrusted input with pickle/marshal/shelve (PROJECT-BRIEF.md §3.6).
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: import pickle
+      - pattern: import marshal
+      - pattern: import shelve
+      - pattern: from pickle import $X
+
+  - id: pqchat-no-eval-exec
+    message: No eval/exec (PROJECT-BRIEF.md §3.6).
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)
+
+  - id: pqchat-non-constant-time-compare
+    message: >-
+      Comparing a MAC/tag/key/secret with `==` or `!=` leaks timing information.
+      Use `hmac.compare_digest` (PROJECT-BRIEF.md §3.3).
+    severity: ERROR
+    languages: [python]
+    patterns:
+      - pattern-either:
+          - pattern: $A == $B
+          - pattern: $A != $B
+      - metavariable-regex:
+          metavariable: $A
+          regex: (?i).*(mac|tag|digest|secret|shared|_key\b|^key\b|^sk\b|^ss\b).*
+      - pattern-not-inside: assert ...
+
+  - id: pqchat-no-hazmat-primitive-construction
+    message: >-
+      Do not build cryptography from low-level hazmat building blocks (raw ciphers,
+      modes, padding). Use AESGCM/HKDF/HMAC from pyca only (PROJECT-BRIEF.md §3.1).
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: cryptography.hazmat.primitives.ciphers.Cipher(...)
+      - pattern: cryptography.hazmat.primitives.ciphers.modes.$M(...)

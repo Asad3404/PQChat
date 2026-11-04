@@ -1,0 +1,140 @@
+# CI for PQ-Chat (PROJECT-BRIEF.md §8). The build fails on:
+#   * any failing test,
+#   * a Bandit high-severity finding,
+#   * a Semgrep error,
+#   * a pip-audit vulnerability,
+#   * (from Milestone 4) a ProVerif query that should hold returning false.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  LIBOQS_PREFIX: ${{ github.workspace }}/.liboqs
+
+jobs:
+  test:
+    name: Lint, type-check, test
+    runs-on: ubuntu-24.04
+    env:
+      # Point liboqs-python at our pinned build so it never auto-downloads another one.
+      OQS_INSTALL_PATH: ${{ github.workspace }}/.liboqs
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install build tools for liboqs
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends cmake ninja-build libssl-dev
+
+      - name: Cache liboqs build
+        id: liboqs-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.LIBOQS_PREFIX }}
+          key: liboqs-${{ runner.os }}-${{ hashFiles('scripts/install_liboqs.sh') }}
+
+      - name: Build liboqs from source
+        if: steps.liboqs-cache.outputs.cache-hit != 'true'
+        run: scripts/install_liboqs.sh "$LIBOQS_PREFIX"
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -c requirements/constraints.txt -e '.[dev]'
+
+      - name: Ruff (lint + format)
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Mypy (strict)
+        run: mypy
+
+      - name: Pytest with coverage
+        run: pytest --cov=pqchat --cov-report=term-missing --cov-report=xml
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.xml
+
+  security:
+    name: Security scans
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install scanners
+        run: |
+          python -m pip install --upgrade pip
+          pip install -c requirements/constraints.txt bandit pip-audit
+          python -m venv /tmp/semgrep && /tmp/semgrep/bin/pip install semgrep==1.183.0
+
+      - name: Bandit (fail on high severity)
+        run: bandit -c pyproject.toml -r src --severity-level high
+
+      - name: Semgrep rule self-test
+        run: /tmp/semgrep/bin/semgrep --test --metrics=off --config .semgrep/pqchat-rules.yml .semgrep/pqchat-rules.py
+
+      - name: Semgrep (project rules + public rulesets)
+        run: >
+          /tmp/semgrep/bin/semgrep scan --error --metrics=off
+          --config .semgrep/pqchat-rules.yml
+          --config p/python
+          --config p/security-audit
+          src tests
+
+      - name: pip-audit (all pinned dependencies)
+        run: pip-audit --strict -r requirements/constraints.txt
+
+  docker:
+    name: Docker build + compose smoke test
+    runs-on: ubuntu-24.04
+    needs: test
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Build images (runs the ML-KEM self-test during build)
+        run: docker compose --profile client build
+
+      - name: Start relay and check health
+        run: |
+          docker compose up -d relay
+          for i in $(seq 1 30); do
+            status=$(docker inspect -f '{{.State.Health.Status}}' pqchat-relay-1 || true)
+            [ "$status" = healthy ] && break
+            sleep 2
+          done
+          test "$status" = healthy
+          curl -fsS http://127.0.0.1:8000/healthz
+
+      - name: Client self-test container
+        run: docker compose run --rm client
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v
+
+  # formal:  ProVerif job is added in Milestone 4.

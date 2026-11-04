@@ -1,0 +1,38 @@
+# Install once:  .venv/bin/pre-commit install
+# Run on all:    .venv/bin/pre-commit run --all-files
+#
+# Tools that are already pinned in pyproject.toml (mypy, bandit) run from the project
+# virtualenv ("language: system") so there is only one version of each.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: detect-private-key     # blocks committing PEM private keys
+      - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3                   # keep equal to ruff in pyproject.toml
+    hooks:
+      - id: ruff-check
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (strict)
+        entry: .venv/bin/mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: bandit
+        name: bandit
+        entry: .venv/bin/bandit -q -c pyproject.toml -r src
+        language: system
+        types: [python]
+        pass_filenames: false
