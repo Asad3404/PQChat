@@ -1,0 +1,41 @@
+# syntax=docker/dockerfile:1
+# Client image. Until Milestone 6 it only runs the ML-KEM/ML-DSA self-test.
+#
+# Two stages:
+#   1. "build"   - compilers + CMake build liboqs from source and install the Python package.
+#   2. "runtime" - slim image with only the compiled library and the virtualenv.
+#      No compiler, no git: smaller attack surface, and liboqs-python cannot silently
+#      download and build a different liboqs at runtime (see ADR-001).
+
+# Base image pinned by digest so every build uses byte-identical layers.
+ARG PYTHON_IMAGE=python:3.12-slim-trixie@sha256:b18b261e1b4974b4f321451ad5251ded85abb22c2b8b262da527dda1d031ab30
+
+FROM ${PYTHON_IMAGE} AS build
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential cmake ninja-build git libssl-dev ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+COPY scripts/install_liboqs.sh /tmp/install_liboqs.sh
+RUN /tmp/install_liboqs.sh /opt/liboqs
+
+RUN python -m venv /opt/venv
+ENV PATH=/opt/venv/bin:$PATH
+WORKDIR /src
+COPY pyproject.toml README.md ./
+COPY requirements/constraints.txt requirements/constraints.txt
+COPY src ./src
+RUN pip install --no-cache-dir -c requirements/constraints.txt .
+
+FROM ${PYTHON_IMAGE} AS runtime
+COPY --from=build /opt/liboqs /opt/liboqs
+COPY --from=build /opt/venv /opt/venv
+ENV PATH=/opt/venv/bin:$PATH \
+    OQS_INSTALL_PATH=/opt/liboqs \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+# Run as an unprivileged user, never root.
+RUN useradd --uid 10001 --create-home --home-dir /home/pqchat --shell /usr/sbin/nologin pqchat
+USER pqchat
+WORKDIR /home/pqchat
+# Fail the build if the PQ library is broken.
+RUN python -m pqchat.selftest
+CMD ["python", "-m", "pqchat.client"]

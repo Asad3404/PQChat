@@ -1,0 +1,37 @@
+# Milestone 0: only the relay stub. Clients are added in Milestone 6.
+#
+#   docker compose up --build            # start the relay
+#   curl http://127.0.0.1:8000/healthz   # check it
+#   docker compose run --rm client       # run the client self-test
+name: pqchat
+
+services:
+  relay:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+    image: pqchat-relay:dev
+    ports:
+      - "127.0.0.1:8000:8000"   # published on localhost only
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    networks: [pqnet]
+
+  client:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.client
+    image: pqchat-client:dev
+    profiles: [client]          # not started by a plain "docker compose up"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    networks: [pqnet]
+    depends_on:
+      relay:
+        condition: service_healthy
+
+networks:
+  pqnet:
+    driver: bridge
