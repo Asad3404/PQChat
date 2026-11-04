@@ -1,8 +1,30 @@
 # Progress log
 
-## 2026-11-04 — M0 Setup
+## 2026-11-04 — M1 Threat model
 
 **Status:** complete, awaiting approval.
+
+**Done**
+- `docs/threat-model.md`: 9 assets, 7 assumptions, Mermaid data-flow diagram (7 elements, 7 flows,
+  6 trust boundaries), attackers A1–A4 with ProVerif/pentest mapping, 9 security goals,
+  36 STRIDE threats, 5 × 5 risk register (inherent and residual), 37 security requirements.
+- `tests/unit/test_threat_model_traceability.py`: 10 checks that make the "done when" criterion machine-checked.
+- Design note `docs/notes/m1-threat-model.md`; thesis notes `docs/thesis-notes/m1-threat-modelling.md`.
+
+**Results**
+- pytest: 23 passed (13 from M0 + 10 traceability checks). Mutation check: 4 deliberately broken
+  versions of the threat model (empty planned test, broken link, wrong score, unjustified acceptance) were each caught.
+- ruff, mypy, Bandit, Semgrep project rules: clean.
+
+**Open issues / decisions needed**
+- 6 *Proposed* requirements need approval: SR-17 safety numbers, SR-18 prekey expiry (bundle format change),
+  SR-37 prekey binding in AD (protocol change), SR-20 retention, SR-21 relay auth, SR-27 history at rest.
+- The Mermaid diagram was syntax-checked by hand, not rendered locally (renderer download blocked in the sandbox).
+
+
+## 2026-11-04 — M0 Setup
+
+**Status:** approved 2026-11-04. GitHub Actions run #1: all jobs green.
 
 **Done**
 - Repository layout from CLAUDE.md §7; `CLAUDE.md`, `README.md`.
@@ -22,7 +44,5 @@
 - Docker (runtime stage): relay healthy, `/healthz` 200, `/docs` 404, runs as uid 10001; client self-test OK.
 
 **Open issues**
-- The sandbox used for development blocks `deb.debian.org` and `semgrep.dev`, so the Docker
-  *build* stage (apt + liboqs compile) and Semgrep *registry* rulesets were not run locally.
-  The first GitHub Actions run is their real test.
+- ~~Docker build stage and Semgrep registry rulesets not run locally~~ — resolved: both passed in GitHub Actions run #1.
 - GitHub Actions are pinned by major tag, not commit SHA (hardening item for M8).
