@@ -19,6 +19,12 @@ def check(tag, expected_tag, mac, data, key, iv, a, b):
     # ok: pqchat-non-constant-time-compare
     if a == b:
         pass
+    # ok: pqchat-non-constant-time-compare
+    if len(key) != 32:
+        pass
+    # ruleid: pqchat-non-constant-time-compare
+    if key == iv:
+        pass
     # ruleid: pqchat-no-eval-exec
     eval("1")
     # ruleid: pqchat-no-hazmat-primitive-construction
