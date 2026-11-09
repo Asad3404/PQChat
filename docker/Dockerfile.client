@@ -33,7 +33,9 @@ ENV PATH=/opt/venv/bin:$PATH \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 # Run as an unprivileged user, never root.
-RUN useradd --uid 10001 --create-home --home-dir /home/pqchat --shell /usr/sbin/nologin pqchat
+RUN useradd --uid 10001 --create-home --home-dir /home/pqchat --shell /usr/sbin/nologin pqchat \
+ && mkdir -p /data /certs && chown pqchat:pqchat /data /certs
+# Named volumes mounted here inherit this ownership, so the app never needs root.
 USER pqchat
 WORKDIR /home/pqchat
 # Fail the build if the PQ library is broken.
