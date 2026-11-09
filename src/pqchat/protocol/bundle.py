@@ -394,3 +394,27 @@ class PrekeyStore:
         if kem_id is not None:
             kem, _ = self.one_time_kem.pop(kem_id)
             kem.wipe()
+
+
+def decode_prekey(blob: bytes) -> SignedPrekey:
+    """Parse a single uploaded prekey of any kind/algorithm (used by the relay)."""
+    from pqchat.protocol.encoding import KEY_LENGTHS
+
+    if len(blob) < 6:
+        raise ParseError("prekey truncated")
+    try:
+        kind = PrekeyKind(blob[0])
+    except ValueError:
+        raise ParseError("unknown prekey kind") from None
+    alg = blob[5]
+    if alg not in (ALG_X25519, ALG_MLKEM768):
+        raise ParseError("unexpected algorithm identifier")
+    r = Reader(blob, 6 + KEY_LENGTHS[alg] + 16 + ED_SIG_LEN + MLDSA_SIG_LEN)
+    prekey = SignedPrekey.read(r, kind, alg)
+    r.end()
+    return prekey
+
+
+def relay_auth_message(purpose: str, username: str, nonce: bytes) -> bytes:
+    """What a client signs to prove to the relay that it owns ``username`` (SR-21)."""
+    return Writer().var(purpose.encode(), 16).var(username.encode(), 64).raw(nonce, 32).getvalue()
