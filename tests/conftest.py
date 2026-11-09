@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 import pytest
 
 from pqchat.protocol.bundle import IdentityKeys, PrekeyStore
+
+if TYPE_CHECKING:
+    from pqchat.protocol.session import Session
 
 NOW = 1_800_000_000  # fixed clock for deterministic expiry tests (2027-01-15)
 
@@ -31,3 +35,16 @@ def alice_identity() -> IdentityKeys:
 @pytest.fixture
 def bob() -> PrekeyStore:
     return make_store()
+
+
+def make_pair(interval: int = 4, **bob_kwargs: object) -> tuple[Session, Session]:
+    """Alice and Bob with an established session (Alice's first message delivered)."""
+    from pqchat.protocol.session import Session
+
+    bob_store = make_store()
+    alice, first = Session.initiate(
+        IdentityKeys.generate(), bob_store.bundle(), b"hello", now=NOW, interval=interval
+    )
+    bob, pt = Session.accept(bob_store, first, now=NOW, interval=interval, **bob_kwargs)  # type: ignore[arg-type]
+    assert pt == b"hello"
+    return alice, bob
