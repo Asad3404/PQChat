@@ -33,18 +33,34 @@ class Session:
         dh_factory: DhFactory | None = None,
         kem_factory: KemFactory | None = None,
     ) -> tuple[Session, bytes]:
+        made: list[Ratchet] = []
+
+        def first_ratchet_message(init: handshake.SessionInit) -> bytes:
+            # Alice's first message is a normal ratchet message (with her ratchet public key
+            # and ML-KEM announcement), carried inside the handshake AEAD. Bob can therefore
+            # answer immediately, exactly as in Signal.
+            if init.peer_ratchet_public is None:
+                raise ProtocolError("internal state error")
+            ratchet = Ratchet.init_alice(
+                init.root_key,
+                init.associated_data,
+                init.peer_ratchet_public,
+                dh_factory=dh_factory,
+                kem=KemRatchet.create(interval, kem_factory),
+            )
+            made.append(ratchet)
+            return ratchet.encrypt(pad(first_plaintext))
+
         message, init = handshake.initiate(
-            alice, bundle, pad(first_plaintext), mode=mode, policy=policy, now=now
+            alice,
+            bundle,
+            b"",
+            mode=mode,
+            policy=policy,
+            now=now,
+            payload_builder=first_ratchet_message,
         )
-        if not (init.peer_ratchet_public is not None):
-            raise ProtocolError("internal state error")
-        ratchet = Ratchet.init_alice(
-            init.root_key,
-            init.associated_data,
-            init.peer_ratchet_public,
-            dh_factory=dh_factory,
-            kem=KemRatchet.create(interval, kem_factory),
-        )
+        ratchet = made[0]
         return cls(ratchet, alice.public, init.peer, mode), message
 
     @classmethod
@@ -61,7 +77,7 @@ class Session:
         kem_factory: KemFactory | None = None,
     ) -> tuple[Session, bytes]:
         init = handshake.respond(bob, message, policy=policy, replay_cache=replay_cache, now=now)
-        if not (init.own_ratchet_keypair is not None):
+        if init.own_ratchet_keypair is None:
             raise ProtocolError("internal state error")
         ratchet = Ratchet.init_bob(
             init.root_key,
@@ -70,7 +86,9 @@ class Session:
             dh_factory=dh_factory,
             kem=KemRatchet.create(interval, kem_factory),
         )
-        return cls(ratchet, bob.identity.public, init.peer, init.mode), unpad(init.plaintext)
+        # The handshake payload is Alice's first ratchet message: process it normally.
+        plaintext = unpad(ratchet.decrypt(init.plaintext))
+        return cls(ratchet, bob.identity.public, init.peer, init.mode), plaintext
 
     def encrypt(self, plaintext: bytes) -> bytes:
         """Pad to a size bucket (SR-24), then encrypt with the next ratchet key."""
