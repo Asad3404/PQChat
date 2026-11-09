@@ -85,6 +85,14 @@ class RelayClient:
                 if kind == "deliver":
                     await self.inbox.put(Delivery(f["id"], f["from"], f["kind"], f["blob"]))
                     continue
+                if kind == "error" and f["req"] == 0:
+                    # Rejected before the relay could read our request id (e.g. rate limit):
+                    # fail every outstanding request instead of letting them time out.
+                    for pending in self._pending.values():
+                        if not pending.done():
+                            pending.set_result((kind, f))
+                    self._pending.clear()
+                    continue
                 fut = self._pending.pop(f["req"], None)
                 if fut is not None and not fut.done():
                     fut.set_result((kind, f))
