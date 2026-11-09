@@ -96,6 +96,8 @@ multi-device sync, group chats.
 | OPK / PQOPK | X25519 / ML-KEM-768 | one-time | optional, deleted after use |
 
 **Every prekey is signed with BOTH Ed25519 and ML-DSA-65. A bundle is valid only if both signatures verify.**
+Each prekey carries `created_at` / `expires_at` inside the signed data; expired prekeys are rejected (SR-18, ADR-002).
+Clients show a 60-digit **safety number** over both users' identity keys and pause sending when a contact's identity key changes (SR-17, ADR-002).
 (PQXDH authenticates with elliptic curves only; dual signatures are this project's contribution towards quantum-resistant authentication.)
 
 ### 5.2 Hybrid handshake (Alice → Bob), PQXDH-style
@@ -109,7 +111,9 @@ multi-device sync, group chats.
    - `(CT, SS) = ML-KEM-768.Encaps(PQOPK_B or PQSPK_B)`
 4. `SK = HKDF-SHA256(ikm = F || DH1 || DH2 || DH3 [|| DH4] || SS, salt = 32 zero bytes, info = "PQChat-v1 X25519 MLKEM768 SHA256 AES256GCM")`,
    where `F` = 32 bytes of `0xFF`.
-5. `AD = Encode(identity public keys of A) || Encode(identity public keys of B)`.
+5. `AD = Encode(identity public keys of A) || Encode(identity public keys of B) || PB`, where
+   `PB = SHA-256("PQChat-v1 prekey binding" || encoded prekey public keys used)` binds the key to the exact prekeys (SR-37, ADR-002).
+   Byte-level details: `docs/protocol-spec.md`.
 6. Initial message = header (version, mode, algorithm IDs, Alice's identity public keys, `EK_A`, `CT`, prekey IDs)
    + AES-256-GCM(key from SK, plaintext, AD || header).
 7. Bob verifies, decapsulates, derives the same `SK`, then deletes any one-time prekeys that were used.
