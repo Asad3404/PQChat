@@ -37,7 +37,13 @@ from pqchat.protocol.bundle import (
     SignedPrekey,
 )
 from pqchat.protocol.encoding import ALG_MLKEM768, ALG_X25519, Reader, Writer
-from pqchat.protocol.errors import DowngradeError, ParseError, ReplayError, VerificationError
+from pqchat.protocol.errors import (
+    DowngradeError,
+    ParseError,
+    ProtocolError,
+    ReplayError,
+    VerificationError,
+)
 from pqchat.protocol.modes import (
     PROTOCOL_VERSION,
     SK_INFO,
@@ -77,7 +83,8 @@ class InitialHeader:
         w.raw(ident, len(ident))
         w.u32(self.spk_id)
         if uses_dh(self.mode):
-            assert self.ek is not None  # noqa: S101 - internal invariant
+            if not (self.ek is not None):
+                raise ProtocolError("internal state error")
             w.key(ALG_X25519, self.ek)
         flags = (FLAG_OPK if self.opk_id is not None else 0) | (
             FLAG_PQ_ONE_TIME if self.pq_one_time else 0
@@ -86,14 +93,16 @@ class InitialHeader:
         if self.opk_id is not None:
             w.u32(self.opk_id)
         if uses_kem(self.mode):
-            assert self.pq_id is not None and self.ct is not None  # noqa: S101
+            if not (self.pq_id is not None and self.ct is not None):
+                raise ProtocolError("internal state error")
             w.u32(self.pq_id).raw(self.ct, CIPHERTEXT_LEN)
         return w.getvalue()
 
     def encode(self) -> bytes:
         out = self.encode_unsigned()
         if self.mode is Mode.PQ_ONLY:
-            assert self.transcript_sig is not None  # noqa: S101
+            if not (self.transcript_sig is not None):
+                raise ProtocolError("internal state error")
             out += Writer().raw(self.transcript_sig, MLDSA_SIG_LEN).getvalue()
         return out
 
@@ -310,7 +319,8 @@ def _respond(
     digest = replay_cache.check(header_bytes) if replay_cache else None  # 4. SR-11
 
     if mode is Mode.PQ_ONLY:
-        assert header.transcript_sig is not None  # noqa: S101 - set by read()
+        if not (header.transcript_sig is not None):
+            raise ProtocolError("internal state error")
         if not mldsa_verify(
             header.identity.sign.mldsa65,
             header.transcript_sig,
@@ -326,7 +336,8 @@ def _respond(
     opk_rec: SignedPrekey | None = None
     dh_outputs: list[bytearray] = []
     if uses_dh(mode):
-        assert header.ek is not None  # noqa: S101
+        if not (header.ek is not None):
+            raise ProtocolError("internal state error")
         dh_outputs = [
             spk_pair.dh(header.identity.dh),
             bob.identity.dh.dh(header.ek),
@@ -339,7 +350,8 @@ def _respond(
     pq_rec: SignedPrekey | None = None
     ss: bytearray | None = None
     if uses_kem(mode):
-        assert header.pq_id is not None and header.ct is not None  # noqa: S101
+        if not (header.pq_id is not None and header.ct is not None):
+            raise ProtocolError("internal state error")
         kem = bob.kem_key(header.pq_id, header.pq_one_time)
         pq_rec = bob.public_record(header.pq_id, ALG_MLKEM768, header.pq_one_time)
         ss = kem.decapsulate(header.ct)
