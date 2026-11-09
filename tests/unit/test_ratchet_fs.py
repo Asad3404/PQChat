@@ -5,6 +5,7 @@ from __future__ import annotations
 import pytest
 
 from pqchat.protocol.errors import ProtocolError
+from pqchat.protocol.padding import unpad
 from pqchat.protocol.ratchet import Ratchet
 from tests.conftest import make_pair
 
@@ -28,4 +29,4 @@ def test_skipped_keys_are_the_exposure_window() -> None:
     late, on_time = alice.encrypt(b"late"), alice.encrypt(b"on time")
     bob.decrypt(on_time)
     stolen = Ratchet(bob.ratchet.state.clone())
-    assert stolen.decrypt(late) == b"late"
+    assert unpad(stolen.decrypt(late)) == b"late"  # the attacker reads the delayed message
