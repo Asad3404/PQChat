@@ -38,4 +38,5 @@ USER pqchat
 WORKDIR /home/pqchat
 # Fail the build if the PQ library is broken.
 RUN python -m pqchat.selftest
+EXPOSE 8701
 CMD ["python", "-m", "pqchat.client"]

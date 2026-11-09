@@ -1,36 +1,78 @@
-# Milestone 0: only the relay stub. Clients are added in Milestone 6.
+# PQ-Chat demo: one relay and two clients on an isolated Docker network.
 #
-#   docker compose up --build            # start the relay
-#   curl http://127.0.0.1:8000/healthz   # check it
-#   docker compose run --rm client       # run the client self-test
+#   docker compose up --build -d
+#   docker compose logs alice bob | grep "PQ-Chat UI"     # each line has a one-time token link
+#
+# Open alice's link in one browser window and bob's in another (both on 127.0.0.1).
+# The relay speaks TLS 1.3 only, with a demo CA created by the `certs` service (M7).
 name: pqchat
 
+x-hardening: &hardening
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  tmpfs: ["/tmp"]
+  networks: [pqnet]
+
 services:
-  relay:
+  certs:
     build:
       context: .
       dockerfile: docker/Dockerfile.server
     image: pqchat-relay:dev
-    ports:
-      - "127.0.0.1:8000:8000"   # published on localhost only
-    read_only: true
-    cap_drop: [ALL]
-    security_opt: ["no-new-privileges:true"]
-    networks: [pqnet]
+    command: ["python", "-m", "pqchat.server.devcerts", "/certs", "relay"]
+    volumes: ["certs:/certs"]
+    <<: *hardening
 
-  client:
+  relay:
+    image: pqchat-relay:dev
+    depends_on:
+      certs:
+        condition: service_completed_successfully
+    environment:
+      PQCHAT_RELAY_DB: /data/relay.db
+      PQCHAT_TLS_CERT: /certs/relay.crt
+      PQCHAT_TLS_KEY: /certs/relay.key
+    volumes: ["relay-data:/data", "certs:/certs:ro"]
+    ports: ["127.0.0.1:8443:8000"]
+    <<: *hardening
+
+  alice:
     build:
       context: .
       dockerfile: docker/Dockerfile.client
     image: pqchat-client:dev
-    profiles: [client]          # not started by a plain "docker compose up"
-    read_only: true
-    cap_drop: [ALL]
-    security_opt: ["no-new-privileges:true"]
-    networks: [pqnet]
     depends_on:
       relay:
         condition: service_healthy
+    environment: &client-env
+      PQCHAT_RELAY_URL: wss://relay:8000/ws
+      PQCHAT_RELAY_CA: /certs/ca.crt
+      PQCHAT_DATA_DIR: /data
+      PQCHAT_UI_BIND: 0.0.0.0
+      PQCHAT_UI_PORT: "8701"
+      PQCHAT_UI_PUBLIC_PORT: "8701"
+    volumes: ["alice-data:/data", "certs:/certs:ro"]
+    ports: ["127.0.0.1:8701:8701"]
+    <<: *hardening
+
+  bob:
+    image: pqchat-client:dev
+    depends_on:
+      relay:
+        condition: service_healthy
+    environment:
+      <<: *client-env
+      PQCHAT_UI_PUBLIC_PORT: "8702"
+    volumes: ["bob-data:/data", "certs:/certs:ro"]
+    ports: ["127.0.0.1:8702:8701"]
+    <<: *hardening
+
+volumes:
+  certs:
+  relay-data:
+  alice-data:
+  bob-data:
 
 networks:
   pqnet:
