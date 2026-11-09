@@ -25,7 +25,7 @@ from pqchat.protocol.pq_ratchet import KemRatchet
 DhFactory = Callable[[], X25519KeyPair]
 
 MAX_SKIP = 1000
-MAX_PLAINTEXT = 64 * 1024
+MAX_PLAINTEXT = 64 * 1024  # = largest padding bucket
 MAX_MESSAGE = MAX_PLAINTEXT + 4096
 FLAG_KEM_CT = 0x01
 FLAG_KEM_PUB = 0x02

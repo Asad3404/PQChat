@@ -57,7 +57,7 @@ from pqchat.protocol.modes import (
 F = b"\xff" * 32
 ZERO_SALT = bytes(32)
 ZERO_NONCE = bytes(aead.NONCE_LEN)
-MAX_FIRST_PLAINTEXT = 16 * 1024
+MAX_FIRST_PLAINTEXT = 16 * 1024  # largest padding bucket allowed in the first message
 MAX_INITIAL_MESSAGE = 32 * 1024
 
 FLAG_OPK = 0x01
