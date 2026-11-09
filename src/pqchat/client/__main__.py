@@ -1,5 +1,16 @@
-"""Client entry point. Until Milestone 6 it only runs the crypto self-test."""
+"""Client entry point.
 
-from pqchat.selftest import main
+``python -m pqchat.client``             start the local web UI (default)
+``python -m pqchat.client --selftest``  only check the post-quantum library
+"""
 
-raise SystemExit(main())
+import sys
+
+if "--selftest" in sys.argv:
+    from pqchat.selftest import main as selftest
+
+    raise SystemExit(selftest())
+
+from pqchat.client.app import main
+
+main()
