@@ -115,6 +115,12 @@ def test_verify_hmac_rejects_wrong_tag() -> None:
     assert not kdf.verify_hmac(b"key", b"data", bytes(bad))
 
 
+def test_sha256_known_value_and_concatenation() -> None:
+    abc = "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    assert kdf.sha256(b"abc") == bytes.fromhex(abc)
+    assert kdf.sha256(b"a", b"bc") == bytes.fromhex(abc)
+
+
 # ------------------------------------------------------------------ AEAD
 def test_aead_detects_any_tampering() -> None:
     key, nonce = os.urandom(32), os.urandom(12)
