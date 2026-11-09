@@ -15,8 +15,8 @@ from dataclasses import dataclass, field
 @dataclass
 class RateLimiter:
     #: Sustained envelopes per second per key, and burst size.
-    rate: float = 20.0
-    burst: float = 60.0
+    rate: float = 50.0
+    burst: float = 200.0
     #: A bundle fetch costs this many tokens from the requester/target bucket.
     bundle_cost: float = 20.0
     clock: Callable[[], float] = field(default=time.monotonic)
