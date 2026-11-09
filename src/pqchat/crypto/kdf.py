@@ -30,6 +30,14 @@ def hmac_sha256(key: bytes | bytearray, data: bytes) -> bytearray:
     return bytearray(mac.finalize())
 
 
+def sha256(*parts: bytes) -> bytes:
+    """SHA-256 over the concatenation of ``parts`` (callers pass a label first)."""
+    digest = hashes.Hash(hashes.SHA256())
+    for part in parts:
+        digest.update(bytes(part))
+    return digest.finalize()
+
+
 def verify_hmac(key: bytes | bytearray, data: bytes, tag: bytes) -> bool:
     """Constant-time tag comparison (SR-3)."""
     return _hmac.compare_digest(bytes(hmac_sha256(key, data)), bytes(tag))
