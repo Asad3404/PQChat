@@ -43,6 +43,10 @@ rules:
           metavariable: $A
           regex: (?i).*(mac|tag|digest|secret|shared|_key\b|^key\b|^sk\b|^ss\b).*
       - pattern-not-inside: assert ...
+      # A length is public information; only the *contents* of secrets must be compared in
+      # constant time.
+      - pattern-not: len(...) == $B
+      - pattern-not: len(...) != $B
 
   - id: pqchat-no-hazmat-primitive-construction
     message: >-
