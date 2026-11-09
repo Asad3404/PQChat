@@ -49,6 +49,7 @@ log = get_logger("pqchat.relay")
 PRE_AUTH = {"register", "login"}
 POST_AUTH = {"upload_prekeys", "fetch_bundle", "send", "ack", "count_prekeys"}
 MAX_BAD_ENVELOPES = 5
+MAX_RATE_VIOLATIONS = 100
 
 
 class Relay:
@@ -150,13 +151,19 @@ class Relay:
         await ws.send_text(wire.build("challenge", nonce=nonce))
         user: str | None = None
         bad = 0
+        violations = 0
         conn_key = f"conn:{id(ws)}"
         try:
             while True:
                 raw = await ws.receive_text()
                 if not self.limiter.allow(conn_key):
-                    await ws.close(code=1008)  # policy violation: rate limit
-                    return
+                    # Drop this envelope and say so; only persistent abuse ends the connection.
+                    violations += 1
+                    if violations >= MAX_RATE_VIOLATIONS:
+                        await ws.close(code=1008)
+                        return
+                    await ws.send_text(wire.build("error", req=0, code="rate_limited"))
+                    continue
                 try:
                     kind, f = wire.parse(raw, POST_AUTH if user else PRE_AUTH)
                 except wire.EnvelopeError:
@@ -199,9 +206,11 @@ class Relay:
                 wire.build("error", req=req, code=err) if err else wire.build("ok", req=req)
             )
         elif kind == "fetch_bundle":
-            if not self.limiter.allow(
+            per_pair = self.limiter.allow(
                 f"bundle:{user}:{f['username']}", cost=self.limiter.bundle_cost
-            ):
+            )
+            # T-16: the target's own budget, shared by every requester.
+            if not (per_pair and self.target_limiter.allow(f"target:{f['username']}")):
                 await ws.send_text(wire.build("error", req=req, code="rate_limited"))
                 return
             bundle = self.fetch_bundle(f["username"])
