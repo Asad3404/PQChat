@@ -309,14 +309,7 @@ class ChatClient:
             session, wire_msg = Session.initiate(st.identity, bundle, payload, policy=Policy())
             kind = "init"
         else:
-            try:
-                wire_msg, kind = session.encrypt(payload), "msg"
-            except ProtocolError:
-                # Bob-side session that has not received anything yet: start our own.
-                bundle = PrekeyBundle.decode(await self.relay.fetch_bundle(name))
-                self._pin(name, bundle.identity)
-                session, wire_msg = Session.initiate(st.identity, bundle, payload, policy=Policy())
-                kind = "init"
+            wire_msg, kind = session.encrypt(payload), "msg"
         st.sessions[name] = session
         self._log(name, "out", text)
         self.save()

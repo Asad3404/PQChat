@@ -25,14 +25,24 @@ def test_both_sides_agree_on_safety_number() -> None:
     assert alice.safety_number() == bob.safety_number()
 
 
-def test_bob_cannot_send_first() -> None:
+def test_bob_can_reply_right_after_the_handshake() -> None:
+    """Alice's first message carries her first ratchet message, so Bob has a sending chain
+    immediately: no second handshake in the other direction (found via the M6 UI run)."""
     from pqchat.protocol.bundle import IdentityKeys
     from pqchat.protocol.session import Session
     from tests.conftest import NOW, make_store
 
     store = make_store()
-    _, first = Session.initiate(IdentityKeys.generate(), store.bundle(), b"x", now=NOW)
-    bob, _ = Session.accept(store, first, now=NOW)
+    alice, first = Session.initiate(IdentityKeys.generate(), store.bundle(), b"x", now=NOW)
+    bob, pt = Session.accept(store, first, now=NOW)
+    assert pt == b"x"
+    assert alice.decrypt(bob.encrypt(b"immediate reply")) == b"immediate reply"
+
+
+def test_responder_ratchet_cannot_send_before_receiving() -> None:
+    from pqchat.crypto.dh import X25519KeyPair
+
+    bob = Ratchet.init_bob(bytearray(32), b"ad", X25519KeyPair.generate())
     with pytest.raises(ProtocolError):
         bob.encrypt(b"too early")
 

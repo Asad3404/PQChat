@@ -20,6 +20,7 @@ Key schedule::
 from __future__ import annotations
 
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
 from pqchat.crypto import aead, kdf, labels
@@ -57,8 +58,9 @@ from pqchat.protocol.modes import (
 F = b"\xff" * 32
 ZERO_SALT = bytes(32)
 ZERO_NONCE = bytes(aead.NONCE_LEN)
-MAX_FIRST_PLAINTEXT = 16 * 1024  # largest padding bucket allowed in the first message
-MAX_INITIAL_MESSAGE = 32 * 1024
+# Room for Alice's first ratchet message: header (<= 2,328 B) + 16 KiB padded text + tag.
+MAX_FIRST_PLAINTEXT = 24 * 1024
+MAX_INITIAL_MESSAGE = 40 * 1024
 
 FLAG_OPK = 0x01
 FLAG_PQ_ONE_TIME = 0x02
@@ -214,11 +216,13 @@ def initiate(
     mode: Mode = Mode.HYBRID,
     policy: Policy | None = None,
     now: int | None = None,
+    payload_builder: Callable[[SessionInit], bytes] | None = None,
 ) -> tuple[bytes, SessionInit]:
+    """Run the handshake. ``payload_builder``, if given, is called once the keys exist and
+    returns the bytes to encrypt instead of ``plaintext`` (the session layer uses it to send
+    Alice's first double-ratchet message inside the handshake)."""
     policy = policy or Policy()
     now = int(time.time()) if now is None else now
-    if len(plaintext) > MAX_FIRST_PLAINTEXT:
-        raise ValueError("first message too long")
     bundle.verify(mode, now, policy)
 
     spk = bundle.spk
@@ -261,12 +265,7 @@ def initiate(
     msg_key, root_key = _derive(mode, dh_outputs, ss)
     flags = (FLAG_OPK if opk else 0) | (FLAG_PQ_ONE_TIME if header.pq_one_time else 0)
     ad = associated_data(alice.public, bundle.identity, prekey_binding(flags, spk, opk, pq))
-    try:
-        body = aead.seal(msg_key, ZERO_NONCE, plaintext, ad + header_bytes)
-    finally:
-        wipe(msg_key)
-    message = header_bytes + Writer().var(body, MAX_FIRST_PLAINTEXT + aead.TAG_LEN).getvalue()
-    return message, SessionInit(
+    init = SessionInit(
         mode=mode,
         root_key=root_key,
         associated_data=ad,
@@ -274,6 +273,16 @@ def initiate(
         peer_ratchet_public=spk.public,
         peer_kem_public=bundle.pqspk.public if bundle.pqspk else None,
     )
+    payload = payload_builder(init) if payload_builder is not None else plaintext
+    if len(payload) > MAX_FIRST_PLAINTEXT:
+        wipe(msg_key)
+        raise ValueError("first message too long")
+    try:
+        body = aead.seal(msg_key, ZERO_NONCE, payload, ad + header_bytes)
+    finally:
+        wipe(msg_key)
+    message = header_bytes + Writer().var(body, MAX_FIRST_PLAINTEXT + aead.TAG_LEN).getvalue()
+    return message, init
 
 
 # ----------------------------------------------------------------------------- Bob
