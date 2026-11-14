@@ -1,0 +1,200 @@
+(* ============================================================================
+   PQ-Chat v1 handshake: symbolic model for ProVerif 2.05
+   Spec: docs/protocol-spec.md section 4. Run with formal/run.sh.
+
+   One file, many scenarios. Lines that start with a tag such as (*#HNDL*) are
+   switched on or off by run.sh:
+     (*#HY*)       hybrid mode          (*#CL*)        classical mode
+     (*#FS*)       identity keys leak after the session (forward secrecy)
+     (*#HNDL*)     every X25519 / Ed25519 secret leaks after the session
+                   (harvest now, decrypt later with a quantum computer)
+     (*#BREAKCL*)  X25519 and Ed25519 broken from the start (active quantum attacker)
+     (*#BREAKPQ*)  ML-KEM-768 and ML-DSA-65 broken from the start
+     (*#AUTH*)     include the agreement (authentication) query
+     (*#SEC*)      include the secrecy query
+   ============================================================================ *)
+
+free c: channel.
+
+type skey.   type pkey.
+type kemsk.  type kempub.  type nonce.
+type edsk.   type edpub.
+type pqsk.   type pqpub.
+type key.
+
+(* ---- X25519 (Diffie-Hellman with the standard commutation equation) ---- *)
+const g: pkey [data].
+fun exp(pkey, skey): pkey.
+equation forall x: skey, y: skey; exp(exp(g, x), y) = exp(exp(g, y), x).
+
+(* ---- ML-KEM-768 (IND-CCA KEM) ---- *)
+fun kempk(kemsk): kempub.
+fun kem_ct(kempub, nonce): bitstring.
+fun kem_ss(kempub, nonce): bitstring.
+reduc forall sk: kemsk, r: nonce; kem_dec(sk, kem_ct(kempk(sk), r)) = kem_ss(kempk(sk), r).
+
+(* ---- Ed25519 and ML-DSA-65 (EUF-CMA signatures) ---- *)
+fun edpk(edsk): edpub.
+fun ed_sign(edsk, bitstring): bitstring.
+reduc forall sk: edsk, m: bitstring; ed_check(edpk(sk), m, ed_sign(sk, m)) = true.
+
+fun pqpk(pqsk): pqpub.
+fun pq_sign(pqsk, bitstring): bitstring.
+reduc forall sk: pqsk, m: bitstring; pq_check(pqpk(sk), m, pq_sign(sk, m)) = true.
+
+(* ---- Breaking primitives (scenario switches) ---- *)
+(*#BREAKCL*)reduc forall x: skey; dh_break(exp(g, x)) = x.
+(*#BREAKCL*)reduc forall sk: edsk; ed_break(edpk(sk)) = sk.
+(*#BREAKPQ*)reduc forall pk: kempub, r: nonce; kem_break(kem_ct(pk, r)) = kem_ss(pk, r).
+(*#BREAKPQ*)reduc forall sk: pqsk; pq_break(pqpk(sk)) = sk.
+
+(* ---- HKDF, SHA-256, AES-256-GCM (random oracle / ideal AEAD) ---- *)
+fun kdf(bitstring): key.
+fun k_msg(key): key.
+fun h(bitstring): bitstring.
+fun aenc(key, bitstring, bitstring): bitstring.
+reduc forall k: key, m: bitstring, ad: bitstring; adec(k, aenc(k, m, ad), ad) = m.
+
+const F, empty, label_id, label_pk, mode_hybrid, mode_classical: bitstring.
+
+(* ---- Honest long-term keys ---- *)
+free ska_ed: edsk [private].  free ska_pq: pqsk [private].  free ska_dh: skey [private].
+free skb_ed: edsk [private].  free skb_pq: pqsk [private].  free skb_dh: skey [private].
+
+(* Charlie is a compromised user: the attacker knows all his private keys from the start. *)
+free skc_ed: edsk.  free skc_pq: pqsk.  free skc_dh: skey.
+
+(* The secret Alice sends, only ever to honest Bob. *)
+free secretA: bitstring [private].
+
+(* Agreement on identities, mode and the session's fresh ephemeral key (unique per session). *)
+event AliceInit(bitstring, bitstring, bitstring, pkey).
+event BobAccept(bitstring, bitstring, bitstring, pkey).
+
+(*#SEC*)query attacker(secretA).
+(* Agreement: if Bob accepts a session as coming from honest Alice, then Alice really ran
+   it, with Bob's identity, the same mode and the same ephemeral key. Non-injective: the
+   injective variant did not terminate within 40 min. Injectivity (no replay) follows from
+   Bob's fresh one-time prekey per session (consumed after authentication, SR-10) and is
+   tested in tests/negative/test_opk_reuse.py and test_replay.py. *)
+(*#AUTH*)query y: bitstring, m: bitstring, k: pkey;
+(*#AUTH*)  event(BobAccept((edpk(ska_ed), pqpk(ska_pq), exp(g, ska_dh)), y, m, k))
+(*#AUTH*)  ==> event(AliceInit((edpk(ska_ed), pqpk(ska_pq), exp(g, ska_dh)), y, m, k)).
+
+(* ============================== hybrid mode ============================== *)
+
+
+(* Alice initiates with a given peer: honest Bob (payload = secretA) or compromised
+   Charlie (payload = empty). The prekeys themselves come from the untrusted network. *)
+let AliceHY(pkb_e: edpub, pkb_p: pqpub, ikb: pkey, payload: bitstring) =
+  let ida = (edpk(ska_ed), pqpk(ska_pq), exp(g, ska_dh)) in
+  let idb = (pkb_e, pkb_p, ikb) in
+  let sia_e = ed_sign(ska_ed, (label_id, ida)) in
+  let sia_p = pq_sign(ska_pq, (label_id, ida)) in
+  in(c, (spk: pkey, s1e: bitstring, s1p: bitstring,
+         opk: pkey, s2e: bitstring, s2p: bitstring,
+         pqk: kempub, s3e: bitstring, s3p: bitstring));
+  (* every prekey signature must verify, with BOTH algorithms (SR-5) *)
+  if ed_check(pkb_e, (label_pk, spk), s1e) = true then
+  if pq_check(pkb_p, (label_pk, spk), s1p) = true then
+  if ed_check(pkb_e, (label_pk, opk), s2e) = true then
+  if pq_check(pkb_p, (label_pk, opk), s2p) = true then
+  if ed_check(pkb_e, (label_pk, pqk), s3e) = true then
+  if pq_check(pkb_p, (label_pk, pqk), s3p) = true then
+  new ek: skey;
+  new r: nonce;
+  let ct = kem_ct(pqk, r) in
+  let sk = kdf((F, exp(spk, ska_dh), exp(ikb, ek), exp(spk, ek), exp(opk, ek), kem_ss(pqk, r))) in
+  let km = k_msg(sk) in
+  let ad = (ida, idb, h((spk, opk, pqk))) in
+  let hdr = (mode_hybrid, ida, sia_e, sia_p, exp(g, ek), ct) in
+  event AliceInit(ida, idb, mode_hybrid, exp(g, ek));
+  out(c, (hdr, aenc(km, payload, (ad, hdr))));
+  (*#HNDL*)phase 1; out(c, ek);
+  0.
+
+let BobHY =
+  let idb = (edpk(skb_ed), pqpk(skb_pq), exp(g, skb_dh)) in
+  new spk_sk: skey;
+  let spk = exp(g, spk_sk) in
+  out(c, (spk, ed_sign(skb_ed, (label_pk, spk)), pq_sign(skb_pq, (label_pk, spk))));
+  !(
+    new opk_sk: skey;  new pqo_sk: kemsk;      (* fresh one-time prekeys per session *)
+    let opk = exp(g, opk_sk) in
+    let pqk = kempk(pqo_sk) in
+    out(c, (opk, ed_sign(skb_ed, (label_pk, opk)), pq_sign(skb_pq, (label_pk, opk)),
+            pqk, ed_sign(skb_ed, (label_pk, pqk)), pq_sign(skb_pq, (label_pk, pqk))));
+    in(c, ((=mode_hybrid, ida_e: edpub, ida_p: pqpub, ika: pkey, sia_e: bitstring, sia_p: bitstring,
+            ek: pkey, ct: bitstring), body: bitstring));
+    let ida = (ida_e, ida_p, ika) in
+    if ed_check(ida_e, (label_id, ida), sia_e) = true then
+    if pq_check(ida_p, (label_id, ida), sia_p) = true then
+    let ss = kem_dec(pqo_sk, ct) in
+    let sk = kdf((F, exp(ika, spk_sk), exp(ek, skb_dh), exp(ek, spk_sk), exp(ek, opk_sk), ss)) in
+    let km = k_msg(sk) in
+    let ad = (ida, idb, h((spk, opk, pqk))) in
+    let hdr = (mode_hybrid, ida, sia_e, sia_p, ek, ct) in
+    let m = adec(km, body, (ad, hdr)) in
+    event BobAccept(ida, idb, mode_hybrid, ek);
+    (*#HNDL*)phase 1; out(c, (spk_sk, opk_sk));
+    0
+  ).
+
+(* ============================= classical mode ============================= *)
+
+let AliceCL(pkb_e: edpub, pkb_p: pqpub, ikb: pkey, payload: bitstring) =
+  let ida = (edpk(ska_ed), pqpk(ska_pq), exp(g, ska_dh)) in
+  let idb = (pkb_e, pkb_p, ikb) in
+  let sia_e = ed_sign(ska_ed, (label_id, ida)) in
+  in(c, (spk: pkey, s1e: bitstring, opk: pkey, s2e: bitstring));
+  if ed_check(pkb_e, (label_pk, spk), s1e) = true then
+  if ed_check(pkb_e, (label_pk, opk), s2e) = true then
+  new ek: skey;
+  let sk = kdf((F, exp(spk, ska_dh), exp(ikb, ek), exp(spk, ek), exp(opk, ek))) in
+  let km = k_msg(sk) in
+  let ad = (ida, idb, h((spk, opk))) in
+  let hdr = (mode_classical, ida, sia_e, exp(g, ek)) in
+  event AliceInit(ida, idb, mode_classical, exp(g, ek));
+  out(c, (hdr, aenc(km, payload, (ad, hdr))));
+  (*#HNDL*)phase 1; out(c, ek);
+  0.
+
+let BobCL =
+  let idb = (edpk(skb_ed), pqpk(skb_pq), exp(g, skb_dh)) in
+  new spk_sk: skey;
+  let spk = exp(g, spk_sk) in
+  out(c, (spk, ed_sign(skb_ed, (label_pk, spk))));
+  !(
+    new opk_sk: skey;
+    let opk = exp(g, opk_sk) in
+    out(c, (opk, ed_sign(skb_ed, (label_pk, opk))));
+    in(c, ((=mode_classical, ida_e: edpub, ida_p: pqpub, ika: pkey, sia_e: bitstring, ek: pkey),
+           body: bitstring));
+    let ida = (ida_e, ida_p, ika) in
+    if ed_check(ida_e, (label_id, ida), sia_e) = true then
+    let sk = kdf((F, exp(ika, spk_sk), exp(ek, skb_dh), exp(ek, spk_sk), exp(ek, opk_sk))) in
+    let km = k_msg(sk) in
+    let ad = (ida, idb, h((spk, opk))) in
+    let hdr = (mode_classical, ida, sia_e, ek) in
+    let m = adec(km, body, (ad, hdr)) in
+    event BobAccept(ida, idb, mode_classical, ek);
+    (*#HNDL*)phase 1; out(c, (spk_sk, opk_sk));
+    0
+  ).
+
+(* ================================ system ================================ *)
+
+process
+  (* public identities and their signatures *)
+  let ida = (edpk(ska_ed), pqpk(ska_pq), exp(g, ska_dh)) in
+  let idb = (edpk(skb_ed), pqpk(skb_pq), exp(g, skb_dh)) in
+  out(c, (ida, ed_sign(ska_ed, (label_id, ida)), pq_sign(ska_pq, (label_id, ida))));
+  out(c, (idb, ed_sign(skb_ed, (label_id, idb)), pq_sign(skb_pq, (label_id, idb))));
+  (
+    (*#HY*)(!AliceHY(edpk(skb_ed), pqpk(skb_pq), exp(g, skb_dh), secretA))
+    (*#HY*)| (!AliceHY(edpk(skc_ed), pqpk(skc_pq), exp(g, skc_dh), empty)) | (!BobHY)
+    (*#CL*)(!AliceCL(edpk(skb_ed), pqpk(skb_pq), exp(g, skb_dh), secretA))
+    (*#CL*)| (!AliceCL(edpk(skc_ed), pqpk(skc_pq), exp(g, skc_dh), empty)) | (!BobCL)
+    (*#FS*)| (phase 1; out(c, (ska_ed, ska_pq, ska_dh, skb_ed, skb_pq, skb_dh)))
+    (*#HNDL*)| (phase 1; out(c, (ska_dh, skb_dh, ska_ed, skb_ed)))
+  )
