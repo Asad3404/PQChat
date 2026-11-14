@@ -1,0 +1,4 @@
+mode,bundle_payload_bytes,first_message_payload_bytes,bundle_wire_bytes,first_message_wire_bytes
+classical,320,160,21406.0,6969.0
+hybrid,21313,6509,21406.0,8061.0
+pq_only,14247,9658,21406.0,11333.0
