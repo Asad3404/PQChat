@@ -1,4 +1,4 @@
-# Full pinned dependency set (runtime + dev), including transitive deps.
+# Full pinned dependency set (runtime + dev + bench), including transitive deps.
 # Regenerate: .venv/bin/pip freeze --exclude-editable > requirements/constraints.txt
 # Used as 'pip install -c requirements/constraints.txt ...' in Docker and CI.
 annotated-doc==0.0.5
@@ -15,31 +15,39 @@ cffi==2.1.1
 cfgv==3.5.0
 charset-normalizer==3.5.2
 click==8.5.0
+contourpy==1.4.0
 coverage==7.17.1
 cryptography==50.0.2
+cycler==0.12.1
 cyclonedx-python-lib==11.12.0
 defusedxml==0.7.1
 distlib==0.4.4
 fastapi==0.162.0
 filelock==4.2.8
+fonttools==4.68.0
 h11==0.16.0
 hypothesis==6.170.14
 identify==2.6.20
 idna==3.20
 iniconfig==2.3.1
+kiwisolver==1.5.1
 liboqs-python==0.16.0.2
 librt==0.16.0
 license-expression==30.4.4
 markdown-it-py==4.2.0
+matplotlib==3.11.2
 mdurl==0.1.2
 msgpack==1.2.4
 mypy==2.4.1
 mypy_extensions==1.2.0
 nodeenv==1.12.0
+numpy==2.5.4
 opentelemetry-api==1.45.2
 packageurl-python==0.17.6
 packaging==26.3
+pandas==3.1.1
 pathspec==1.1.1
+pillow==13.0.0
 pip-requirements-parser==32.0.1
 pip_api==0.0.35
 pip_audit==2.10.1
@@ -56,6 +64,7 @@ pyparsing==3.3.3
 pytest==9.2.0
 pytest-benchmark==5.3.1
 pytest-cov==7.1.0
+python-dateutil==4.0.0
 python-discovery==1.9.4
 PyYAML==6.0.3
 requests==2.34.2
@@ -68,6 +77,7 @@ tomli==2.5.0
 tomli_w==1.2.0
 typing-inspection==0.4.4
 typing_extensions==4.16.0
+tzdata==2026.6
 urllib3==2.8.0
 uvicorn==0.54.0
 virtualenv==21.15.5
