@@ -1,0 +1,60 @@
+(* ============================================================================
+   PQ-Chat v1: bounded model of post-compromise security of the PQ double ratchet
+   Design: docs/notes/m5-pq-ratchet.md. Run with formal/run.sh.
+
+   Situation: the attacker has stolen the whole session state (root key rk0) and has a
+   quantum computer, so every X25519 output is public. We follow three root-chain steps:
+
+     step 1  DH ratchet only                  -> m1   (expected: attacker learns it)
+     step 2a DH ratchet only (counterfactual) -> m2c  (expected: attacker learns it)
+     step 2  DH ratchet + fresh ML-KEM secret -> m2   (expected: SECRET)
+
+   PCS needs the attacker to be passive while the fresh KEM key travels (otherwise, holding
+   rk1, it could substitute the announced key). We model that by also handing Alice the real
+   key on a private channel; the attacker still sees everything on the public channel.
+   ============================================================================ *)
+
+free c: channel.
+free authentic: channel [private].
+
+type key. type kemsk. type kempub. type nonce.
+
+fun kempk(kemsk): kempub.
+fun kem_ct(kempub, nonce): bitstring.
+fun kem_ss(kempub, nonce): bitstring.
+reduc forall sk: kemsk, r: nonce; kem_dec(sk, kem_ct(kempk(sk), r)) = kem_ss(kempk(sk), r).
+
+fun kdf_rk(key, bitstring): key.          (* root step, DH only        *)
+fun kdf_rk_pq(key, bitstring, bitstring): key.   (* root step, DH + ML-KEM *)
+fun aenc(key, bitstring): bitstring.
+reduc forall k: key, m: bitstring; adec(k, aenc(k, m)) = m.
+
+(* Stolen at time t: public. *)
+free rk0: key.
+
+free m1, m2, m2c: bitstring [private].
+
+query attacker(m1).
+query attacker(m2c).
+query attacker(m2).
+
+process
+  (* Quantum attacker: DH outputs of every step are known (published here). *)
+  new dh1: bitstring; out(c, dh1);
+  new dh2: bitstring; out(c, dh2);
+  let rk1 = kdf_rk(rk0, dh1) in
+  out(c, aenc(rk1, m1));
+  (* counterfactual next step without ML-KEM *)
+  out(c, aenc(kdf_rk(rk1, dh2), m2c));
+  (* Bob's fresh ML-KEM ratchet key, created after the compromise *)
+  new bsk: kemsk;
+  out(c, kempk(bsk));
+  out(authentic, kempk(bsk));
+  (
+    (* Alice: encapsulates to Bob's real key and mixes SS into the root step *)
+    in(authentic, pk: kempub);
+    new r: nonce;
+    out(c, kem_ct(pk, r));
+    let rk2 = kdf_rk_pq(rk1, dh2, kem_ss(pk, r)) in
+    out(c, aenc(rk2, m2))
+  )
