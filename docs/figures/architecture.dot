@@ -1,0 +1,28 @@
+// PQ-Chat architecture with trust boundaries. Render: scripts/make_figures.py
+digraph pqchat {
+  graph [rankdir=LR, fontname="Helvetica", fontsize=11, nodesep=0.45, ranksep=0.7, pad=0.2];
+  node  [shape=box, style="rounded,filled", fillcolor="#ffffff", color="#5b6470", fontname="Helvetica", fontsize=10];
+  edge  [color="#5b6470", fontname="Helvetica", fontsize=8];
+
+  subgraph cluster_a { label="Alice's device (trusted while not compromised)"; style="rounded,dashed"; color="#2f5d9e"; fontcolor="#2f5d9e";
+    ba [label="Browser UI\n127.0.0.1 · token · CSP"];
+    ca [label="Client process\nall cryptography\nhandshake · ratchet", fillcolor="#e8eef7"];
+    ka [label="Key store (disk)\nArgon2id + AES-256-GCM", shape=cylinder];
+  }
+  subgraph cluster_r { label="Relay host (UNTRUSTED)"; style="rounded,dashed"; color="#b3261e"; fontcolor="#b3261e";
+    r  [label="Relay\nFastAPI · WebSocket\nauth by dual signature\nrate limits"];
+    db [label="SQLite\npublic keys + ciphertext\nretention ≤ 30 days", shape=cylinder];
+  }
+  subgraph cluster_b { label="Bob's device"; style="rounded,dashed"; color="#2f5d9e"; fontcolor="#2f5d9e";
+    cb [label="Client process", fillcolor="#e8eef7"];
+    bb [label="Browser UI"];
+    kb [label="Key store", shape=cylinder];
+  }
+  ba -> ca [label="TB-1 plaintext", dir=both];
+  ca -> ka [label="TB-5", dir=both];
+  ca -> r  [label="TB-2/3  TLS 1.3 (X25519MLKEM768)\nJSON envelopes, E2E ciphertext", dir=both, color="#2f5d9e"];
+  r  -> db [label="TB-4", dir=both];
+  r  -> cb [label="TLS 1.3", dir=both, color="#2f5d9e"];
+  cb -> bb [dir=both];
+  cb -> kb [dir=both];
+}
