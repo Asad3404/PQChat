@@ -100,8 +100,9 @@ initiator MUST refuse a bundle without any ML-KEM prekey (SR-6, downgrade).
    AD = IdentityPublic(A) || IdentityPublic(B) || PB
    ```
 6. pq-only only: `transcript_sig = ML-DSA.Sign(IKsig_pq_A, ctx = label, header_unsigned || IdentityPublic(B))`.
-7. Send `header || u16 len || AES-256-GCM(k_msg, nonce = 0^96, plaintext, AD || header)`.
-   The zero nonce is safe because `k_msg` encrypts exactly one message.
+7. Send `header || u16 len || AES-256-GCM(k_msg, nonce = 0^96, payload, AD || header)`.
+   The zero nonce is safe because `k_msg` encrypts exactly one message. Since ADR-003 the
+   `payload` is **Alice's first double-ratchet message** (§6), so Bob can reply immediately.
 
 ### 4.2 Header
 
@@ -113,16 +114,19 @@ header = version u8 || mode u8 || kex u8 || sig u8 || aead u8 || IdentityPublic(
          || [transcript_sig[3309]]                                 (pq-only only)
 ```
 
-Measured sizes of the initial message with an empty plaintext:
+Measured sizes of the initial message (M11, `bench/results/sizes.csv`; payload = first ratchet
+message with a short text, padded to 256 B):
 
-| Mode | with one-time prekeys | last-resort only |
+| Mode | Initial message on the wire | of which handshake header |
 |---|---|---|
-| classical | 5,457 B | 5,453 B |
-| hybrid | 6,549 B | 6,545 B |
-| pq-only | 9,821 B | 9,821 B |
+| classical | 6,969 B | ≈ 5,430 B |
+| hybrid | 8,061 B | ≈ 6,520 B |
+| pq-only | 11,333 B | ≈ 9,800 B |
 
-Most of the size is Alice's `IdentityPublic` (5,392 B), dominated by her ML-DSA-65 key and the
-ML-DSA signature over `IKdh`. The hybrid premium over classical is exactly `pq_id` + `CT` = 1,092 B.
+Most of the header is Alice's `IdentityPublic` (5,392 B), dominated by her ML-DSA-65 key and the
+ML-DSA signature over `IKdh`. The hybrid premium over classical in the header is `pq_id` + `CT` =
+1,092 B. The ratchet payload adds its 47-byte header, Alice's ML-KEM announcement (1,189 B), the
+padded text and two 16-byte tags.
 
 ### 4.3 Bob (order matters)
 
@@ -144,15 +148,38 @@ For each user: `SHA-256("PQChat-v1 safety number" || key(ED25519) || key(MLDSA65
 the first 30 bytes become six 5-digit groups (each 5-byte chunk mod 100000). The two 30-digit halves
 are sorted and concatenated into 60 digits that are identical on both devices.
 
-## 5. Ongoing messages
+## 5. Hand-over from handshake to ratchet
 
-Specified in §6 of this document once Milestone 5 is complete; the design is in
-`docs/notes/m5-pq-ratchet.md`. The handshake hands over `RK`, `AD`, Bob's signed prekey as the first
-DH-ratchet public key, and Bob's signed ML-KEM prekey as the first PQ re-key target.
+The handshake outputs `RK₀` (initial root key) and `AD`. Alice's ratchet starts with Bob's signed
+prekey `SPK_B` as the peer's first DH ratchet key, generates her own ratchet key pair and a first
+ML-KEM ratchet key pair, and performs one sending step. Bob's ratchet starts with the `SPK_B` key
+pair. Alice's first ratchet message is the handshake payload (ADR-003).
 
-## 6. Double ratchet and post-quantum re-keying
+## 6. Double ratchet with ML-KEM re-keying
 
-See `docs/notes/m5-pq-ratchet.md` (normative for v1 until merged here).
+Normative details and reasoning: `docs/notes/m5-pq-ratchet.md`. Summary:
+
+```
+header = version u8 | flags u8 | key(X25519, DHs) | PN u32 | N u32 | kem_ack u32
+         [| target_kem_id u32 | CT[1088]]               flags & 0x01  ML-KEM re-key
+         [| own_kem_id u32 | key(MLKEM768, public)]     flags & 0x02  KEM key announcement
+message = header | u32 len | AES-256-GCM(key, nonce, pad(plaintext), AD || header)
+
+KDF_RK(RK, dh [, ss]) = HKDF(salt RK, dh [|| ss], "…ratchet root" | "…ratchet root pq", 64) -> RK', CK
+KDF_CK(CK)            = MK = HMAC(CK, "…chain message"), CK' = HMAC(CK, "…chain next")
+(key, nonce)          = HKDF(salt 0, MK, "…ratchet message keys", 44)
+```
+
+* Each party encapsulates to the peer's newest announced ML-KEM key on every K/2-th own sending
+  chain (K = 4 DH ratchet steps in total), generates a fresh own KEM key pair when its current one is
+  used, and announces its public key until the peer acknowledges it (`kem_ack`).
+* Receiving runs on a copy of the state, committed only if the AEAD verifies; replays are rejected;
+  at most 1,000 skipped message keys.
+* Plaintext is padded (ISO/IEC 7816-4) to 256 / 1,024 / 4,096 / 16,384 / 65,536 bytes.
+* Measured sizes: plain header 47 B; + ciphertext 1,139 B; + ciphertext and announcement 2,328 B.
+  Mean message size in a two-way conversation: 1,458 B at K = 4 (`bench/results/k_tradeoff.csv`).
+* **Simplification:** Signal's SPQR spreads KEM keys and ciphertexts over many messages with the
+  erasure-coded ML-KEM Braid; we send them whole.
 
 ## 7. Security properties and where they are checked
 

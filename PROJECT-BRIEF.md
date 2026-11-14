@@ -115,7 +115,7 @@ Clients show a 60-digit **safety number** over both users' identity keys and pau
    `PB = SHA-256("PQChat-v1 prekey binding" || encoded prekey public keys used)` binds the key to the exact prekeys (SR-37, ADR-002).
    Byte-level details: `docs/protocol-spec.md`.
 6. Initial message = header (version, mode, algorithm IDs, Alice's identity public keys, `EK_A`, `CT`, prekey IDs)
-   + AES-256-GCM(key from SK, plaintext, AD || header).
+   + AES-256-GCM(key from SK, plaintext, AD || header). The plaintext is Alice's first double-ratchet message (ADR-003).
 7. Bob verifies, decapsulates, derives the same `SK`, then deletes any one-time prekeys that were used.
 
 ### 5.3 Ongoing messages
