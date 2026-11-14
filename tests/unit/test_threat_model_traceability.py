@@ -155,3 +155,22 @@ def test_every_goal_is_covered(goals: list[Row], requirements: list[Row]) -> Non
         srs = _ids(g["Requirements"], "SR")
         assert srs, f"{g['ID']} has no requirement"
         assert set(srs) <= known, g["ID"]
+
+
+def test_evidence_of_done_requirements_exists(requirements: list[Row]) -> None:
+    """A requirement marked Done must cite evidence that really exists in the repository."""
+    root = DOC.parents[1]
+    for sr in requirements:
+        if not sr["Status"].startswith("Done"):
+            continue
+        cited = re.findall(
+            r"`((?:tests|attacks|forensics|formal|scripts|bench|evidence|src|docs|docker|\.github|\.semgrep)/[^`:]+)",
+            sr["Planned verification"],
+        )
+        assert (
+            cited
+            or "review" in sr["Planned verification"].lower()
+            or "Semgrep" in sr["Planned verification"]
+        ), sr["ID"]
+        for path in cited:
+            assert (root / path.rstrip("/")).exists(), f"{sr['ID']} cites missing {path}"
