@@ -104,7 +104,7 @@ jobs:
           --config .semgrep/pqchat-rules.yml
           --config p/python
           --config p/security-audit
-          src tests
+          src tests attacks forensics bench scripts
 
       - name: pip-audit (all pinned dependencies)
         run: pip-audit --strict -r requirements/constraints.txt
