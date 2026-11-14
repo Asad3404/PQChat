@@ -113,21 +113,20 @@ def main() -> None:
             log = work / "attack.jsonl"
             port = free_port()
             env = {**os.environ, "PQCHAT_ATTACK": mode, "PQCHAT_ATTACK_LOG": str(log)}
-            proc = subprocess.Popen(  # noqa: S603 - fixed local command
-                [
-                    args.mitmdump,
-                    "--mode",
-                    f"reverse:http://{relay_addr}",
-                    "--listen-host",
-                    "127.0.0.1",
-                    "--listen-port",
-                    str(port),
-                    "-q",
-                    "-s",
-                    str(ROOT / "attacks" / "mitm_prekey_swap.py"),
-                ],
-                env=env,
-            )
+            cmd = [
+                args.mitmdump,
+                "--mode",
+                f"reverse:http://{relay_addr}",
+                "--listen-host",
+                "127.0.0.1",
+                "--listen-port",
+                str(port),
+                "-q",
+                "-s",
+                str(ROOT / "attacks" / "mitm_prekey_swap.py"),
+            ]
+            # The mitmdump path is the operator's own CLI argument; arguments are a list (no shell).
+            proc = subprocess.Popen(cmd, env=env)  # noqa: S603  # nosemgrep: python.lang.security.audit.dangerous-subprocess-use-tainted-env-args.dangerous-subprocess-use-tainted-env-args
             try:
                 time.sleep(4)
                 outcome = asyncio.run(scenario(mode, relay_addr, port, work, pin_first))
