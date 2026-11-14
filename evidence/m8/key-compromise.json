@@ -1,0 +1,40 @@
+[
+  {
+    "attacker": "classical",
+    "K": 8,
+    "reads_messages_before_theft": {
+      "before theft 0": false,
+      "before theft 1": false,
+      "before theft 2": false
+    },
+    "reads_round_after_theft": [
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ]
+  },
+  {
+    "attacker": "quantum (all X25519 keys)",
+    "K": 8,
+    "reads_messages_before_theft": {
+      "before theft 0": false,
+      "before theft 1": false,
+      "before theft 2": false
+    },
+    "reads_round_after_theft": [
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false
+    ]
+  }
+]

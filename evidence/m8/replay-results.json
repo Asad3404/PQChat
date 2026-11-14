@@ -1,0 +1,9 @@
+{
+  "replayed": [
+    "init",
+    "msg"
+  ],
+  "history_unchanged": true,
+  "dropped_by_bob": 2,
+  "passed": true
+}

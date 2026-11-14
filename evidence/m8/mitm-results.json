@@ -1,0 +1,81 @@
+[
+  {
+    "mode": "swap-spk",
+    "pinned_before": false,
+    "alice_sent": false,
+    "blocked_by": "VerificationError (prekey signature invalid)",
+    "bob_received": [],
+    "safety_number_alice_sees_for_bob": "503896722211413317820659656606786765215413987659127833172031",
+    "safety_number_bob_sees_for_alice": "",
+    "safety_numbers_match": false,
+    "attacker_log": [
+      {
+        "mode": "swap-spk",
+        "event": "bundle_tampered",
+        "target": "bob"
+      }
+    ]
+  },
+  {
+    "mode": "strip-pq",
+    "pinned_before": false,
+    "alice_sent": false,
+    "blocked_by": "DowngradeError (no post-quantum prekey, SR-6)",
+    "bob_received": [],
+    "safety_number_alice_sees_for_bob": "320980459628694081703543248750836032383179994401061773695932",
+    "safety_number_bob_sees_for_alice": "",
+    "safety_numbers_match": false,
+    "attacker_log": [
+      {
+        "mode": "strip-pq",
+        "event": "bundle_tampered",
+        "target": "bob"
+      }
+    ]
+  },
+  {
+    "mode": "swap-identity",
+    "pinned_before": false,
+    "alice_sent": true,
+    "bob_received": [],
+    "safety_number_alice_sees_for_bob": "444747050817270647518411883388971545755958803554902275882544",
+    "safety_number_bob_sees_for_alice": "",
+    "safety_numbers_match": false,
+    "attacker_log": [
+      {
+        "mode": "swap-identity",
+        "event": "bundle_tampered",
+        "target": "bob"
+      },
+      {
+        "mode": "swap-identity",
+        "event": "initial_message_seen",
+        "to": "bob"
+      },
+      {
+        "mode": "swap-identity",
+        "event": "attacker_decrypted",
+        "plaintext": "secret plan for thursday"
+      }
+    ]
+  },
+  {
+    "mode": "swap-identity",
+    "pinned_before": true,
+    "alice_sent": false,
+    "blocked_by": "KeyChangedError (identity pinned, SR-17)",
+    "bob_received": [
+      "hello before the attack"
+    ],
+    "safety_number_alice_sees_for_bob": "070765154587964339348126188630827654336037583231059822920678",
+    "safety_number_bob_sees_for_alice": "027381032965034286515157319798070765154587964339348126188630",
+    "safety_numbers_match": false,
+    "attacker_log": [
+      {
+        "mode": "swap-identity",
+        "event": "bundle_tampered",
+        "target": "bob"
+      }
+    ]
+  }
+]

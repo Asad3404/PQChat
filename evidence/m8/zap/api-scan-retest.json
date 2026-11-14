@@ -1,0 +1,521 @@
+{
+	"@programName": "ZAP",
+	"@version": "2.17.0",
+	"@generated": "Sat, 14 Nov 2026 12:14:48",
+	"created": "2026-11-14T12:14:48.448988853Z",
+	"insights":[
+		{
+			"level": "Low",
+			"reason": "Warning",
+			"site": "",
+			"key": "insight.log.error",
+			"description": "ZAP errors logged - see the zap.log file for details",
+			"statistic": "13"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "",
+			"key": "insight.network.failure",
+			"description": "Percentage of network failures",
+			"statistic": "2"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://127.0.0.1:8701",
+			"key": "insight.code.2xx",
+			"description": "Percentage of responses with status code 2xx",
+			"statistic": "6"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://127.0.0.1:8701",
+			"key": "insight.code.4xx",
+			"description": "Percentage of responses with status code 4xx",
+			"statistic": "93"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://127.0.0.1:8701",
+			"key": "insight.endpoint.ctype.application/json",
+			"description": "Percentage of endpoints with content type application/json",
+			"statistic": "90"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://127.0.0.1:8701",
+			"key": "insight.endpoint.ctype.text/html",
+			"description": "Percentage of endpoints with content type text/html",
+			"statistic": "3"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://127.0.0.1:8701",
+			"key": "insight.endpoint.ctype.text/javascript",
+			"description": "Percentage of endpoints with content type text/javascript",
+			"statistic": "6"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://127.0.0.1:8701",
+			"key": "insight.endpoint.method.GET",
+			"description": "Percentage of endpoints with method GET",
+			"statistic": "51"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://127.0.0.1:8701",
+			"key": "insight.endpoint.method.POST",
+			"description": "Percentage of endpoints with method POST",
+			"statistic": "48"
+		},
+		{
+			"level": "Info",
+			"reason": "Informational",
+			"site": "http://127.0.0.1:8701",
+			"key": "insight.endpoint.total",
+			"description": "Count of total endpoints",
+			"statistic": "31"
+		}
+	],
+	"site":[ 
+		{
+			"@name": "http://127.0.0.1:8701",
+			"@host": "127.0.0.1",
+			"@port": "8701",
+			"@ssl": "false",
+			"alerts": [ 
+				{
+					"pluginid": "100001",
+					"alertRef": "100001",
+					"alert": "Unexpected Content-Type was returned",
+					"name": "Unexpected Content-Type was returned",
+					"riskcode": "1",
+					"confidence": "3",
+					"riskdesc": "Low (High)",
+					"desc": "<p>A Content-Type of text/html was returned by the server.</p><p>This is not one of the types expected to be returned by an API.</p><p>Raised by the 'Alert on Unexpected Content Types' script</p>",
+					"instances":[ 
+						{
+							"id": "8",
+							"uri": "http://127.0.0.1:8701",
+							"nodeName": "http:\/\/127.0.0.1:8701",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "374",
+							"uri": "http://127.0.0.1:8701/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/html",
+							"otherinfo": ""
+						},
+						{
+							"id": "3",
+							"uri": "http://127.0.0.1:8701/static/app.js",
+							"nodeName": "http:\/\/127.0.0.1:8701\/static\/app.js",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/javascript",
+							"otherinfo": ""
+						},
+						{
+							"id": "382",
+							"uri": "http://127.0.0.1:8701/static/app.js/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/static\/app.js\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "text/javascript",
+							"otherinfo": ""
+						}
+					],
+					"count": "4",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "24"
+				},
+				{
+					"pluginid": "100000",
+					"alertRef": "100000-1",
+					"alert": "A Client Error response code was returned by the server",
+					"name": "A Client Error response code was returned by the server",
+					"riskcode": "0",
+					"confidence": "3",
+					"riskdesc": "Informational (High)",
+					"desc": "<p>A response code of 404 was returned by the server.</p><p>This may indicate that the application is failing to handle unexpected input correctly.</p><p>Raised by the 'Alert on HTTP Response Code Error' script</p>",
+					"instances":[ 
+						{
+							"id": "4",
+							"uri": "http://127.0.0.1:8701/6026865946512766076",
+							"nodeName": "http:\/\/127.0.0.1:8701\/6026865946512766076",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "9",
+							"uri": "http://127.0.0.1:8701/api",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "376",
+							"uri": "http://127.0.0.1:8701/api/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "5",
+							"uri": "http://127.0.0.1:8701/api/3774454254363031474",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/3774454254363031474",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "12",
+							"uri": "http://127.0.0.1:8701/api/chat",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "378",
+							"uri": "http://127.0.0.1:8701/api/chat/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "6",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/3017575943920140479",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/3017575943920140479",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "435",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/actuator/health",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/actuator\/health",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "15",
+							"uri": "http://127.0.0.1:8701/static",
+							"nodeName": "http:\/\/127.0.0.1:8701\/static",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "380",
+							"uri": "http://127.0.0.1:8701/static/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/static\/",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "7",
+							"uri": "http://127.0.0.1:8701/static/4383393622338277138",
+							"nodeName": "http:\/\/127.0.0.1:8701\/static\/4383393622338277138",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "2",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/accept-key",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/accept-key",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "367",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/accept-key/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/accept-key\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "0",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/send",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/send ()({text})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "404",
+							"otherinfo": ""
+						},
+						{
+							"id": "32",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/send",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/send ()({text})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "368",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/send/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/send\/ ()({text})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "429",
+							"otherinfo": ""
+						},
+						{
+							"id": "1",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/verify",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/verify ()({verified})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "372",
+							"uri": "http://127.0.0.1:8701/api/chat/bob/verify/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/chat\/bob\/verify\/ ()({verified})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "400",
+							"otherinfo": ""
+						},
+						{
+							"id": "31",
+							"uri": "http://127.0.0.1:8701/api/unlock",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/unlock ()({username,passphrase})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "11",
+							"uri": "http://127.0.0.1:8701/api/unlock",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/unlock ()({username,passphrase})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "422",
+							"otherinfo": ""
+						},
+						{
+							"id": "373",
+							"uri": "http://127.0.0.1:8701/api/unlock/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/unlock\/ ()({username,passphrase})",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "409",
+							"otherinfo": ""
+						},
+						{
+							"id": "269",
+							"uri": "http://127.0.0.1:8701/computeMetadata/v1/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/computeMetadata\/v1\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "265",
+							"uri": "http://127.0.0.1:8701/latest/meta-data/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/latest\/meta-data\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "296",
+							"uri": "http://127.0.0.1:8701/metadata/instance",
+							"nodeName": "http:\/\/127.0.0.1:8701\/metadata\/instance",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "298",
+							"uri": "http://127.0.0.1:8701/metadata/v1",
+							"nodeName": "http:\/\/127.0.0.1:8701\/metadata\/v1",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "278",
+							"uri": "http://127.0.0.1:8701/opc/v1/instance/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/opc\/v1\/instance\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "283",
+							"uri": "http://127.0.0.1:8701/opc/v2/instance/",
+							"nodeName": "http:\/\/127.0.0.1:8701\/opc\/v2\/instance\/",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						},
+						{
+							"id": "301",
+							"uri": "http://127.0.0.1:8701/openstack/latest/meta_data.json",
+							"nodeName": "http:\/\/127.0.0.1:8701\/openstack\/latest\/meta_data.json",
+							"method": "POST",
+							"param": "",
+							"attack": "",
+							"evidence": "421",
+							"otherinfo": ""
+						}
+					],
+					"count": "28",
+					"systemic": false,
+					"solution": "",
+					"otherinfo": "",
+					"reference": "",
+					"cweid": "388",
+					"wascid": "20",
+					"sourceid": "13"
+				},
+				{
+					"pluginid": "10111",
+					"alertRef": "10111",
+					"alert": "Authentication Request Identified",
+					"name": "Authentication Request Identified",
+					"riskcode": "0",
+					"confidence": "1",
+					"riskdesc": "Informational (Low)",
+					"desc": "<p>The given request has been identified as an authentication request. The 'Other Info' field contains a set of key=value lines which identify any relevant fields. If the request is in a context which has an Authentication Method set to \"Auto-Detect\" then this rule will change the authentication to match the request identified.</p>",
+					"instances":[ 
+						{
+							"id": "274",
+							"uri": "http://127.0.0.1:8701/api/unlock",
+							"nodeName": "http:\/\/127.0.0.1:8701\/api\/unlock ()({username,passphrase})",
+							"method": "POST",
+							"param": "username",
+							"attack": "",
+							"evidence": "passphrase",
+							"otherinfo": "userParam=username\nuserValue=zapscanner\npasswordParam=passphrase"
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>This is an informational alert rather than a vulnerability and so there is nothing to fix.</p>",
+					"otherinfo": "<p>userParam=username</p><p>userValue=zapscanner</p><p>passwordParam=passphrase</p>",
+					"reference": "<p>https://www.zaproxy.org/docs/desktop/addons/authentication-helper/auth-req-id/</p>",
+					"cweid": "-1",
+					"wascid": "-1",
+					"sourceid": "4"
+				},
+				{
+					"pluginid": "10027",
+					"alertRef": "10027",
+					"alert": "Information Disclosure - Suspicious Comments",
+					"name": "Information Disclosure - Suspicious Comments",
+					"riskcode": "0",
+					"confidence": "2",
+					"riskdesc": "Informational (Medium)",
+					"desc": "<p>The response appears to contain suspicious comments which may help an attacker.</p>",
+					"instances":[ 
+						{
+							"id": "473",
+							"uri": "http://127.0.0.1:8701/static/app.js",
+							"nodeName": "http:\/\/127.0.0.1:8701\/static\/app.js",
+							"method": "GET",
+							"param": "",
+							"attack": "",
+							"evidence": "rage and is removed from the address bar and",
+							"otherinfo": "The following pattern was used: \\bFROM\\b and was detected in likely comment: \"// sessionStorage and is removed from the address bar and history.\", see evidence field for the suspicious comment/snippet."
+						}
+					],
+					"count": "1",
+					"systemic": false,
+					"solution": "<p>Remove all comments that return information that may help an attacker and fix any underlying problems they refer to.</p>",
+					"otherinfo": "<p>The following pattern was used: \\bFROM\\b and was detected in likely comment: \"// sessionStorage and is removed from the address bar and history.\", see evidence field for the suspicious comment/snippet.</p>",
+					"reference": "",
+					"cweid": "615",
+					"wascid": "13",
+					"sourceid": "11"
+				}
+			]
+		}
+	],
+	"sequences":[
+	]
+
+}

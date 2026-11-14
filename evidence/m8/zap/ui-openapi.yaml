@@ -1,0 +1,47 @@
+# Hand-written OpenAPI description of the local UI API, used only to drive the ZAP active scan.
+# (The running app deliberately serves no OpenAPI document.)
+openapi: 3.0.3
+info: {title: PQ-Chat local UI API, version: "1"}
+servers: [{url: "http://127.0.0.1:8701"}]
+paths:
+  /api/status:
+    get: {responses: {"200": {description: ok}}}
+  /api/unlock:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username: {type: string, example: zapscanner}
+                passphrase: {type: string, example: zap-scanner-passphrase}
+      responses: {"200": {description: ok}}
+  /api/chat/{name}:
+    get:
+      parameters: [{name: name, in: path, required: true, schema: {type: string, example: bob}}]
+      responses: {"200": {description: ok}}
+  /api/chat/{name}/send:
+    post:
+      parameters: [{name: name, in: path, required: true, schema: {type: string, example: bob}}]
+      requestBody:
+        content:
+          application/json:
+            schema: {type: object, properties: {text: {type: string, example: hello}}}
+      responses: {"200": {description: ok}}
+  /api/chat/{name}/verify:
+    post:
+      parameters: [{name: name, in: path, required: true, schema: {type: string, example: bob}}]
+      requestBody:
+        content:
+          application/json:
+            schema: {type: object, properties: {verified: {type: boolean, example: true}}}
+      responses: {"200": {description: ok}}
+  /api/chat/{name}/accept-key:
+    post:
+      parameters: [{name: name, in: path, required: true, schema: {type: string, example: bob}}]
+      responses: {"200": {description: ok}}
+  /static/{name}:
+    get:
+      parameters: [{name: name, in: path, required: true, schema: {type: string, example: app.js}}]
+      responses: {"200": {description: ok}}
