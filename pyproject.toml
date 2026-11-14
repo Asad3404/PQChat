@@ -87,6 +87,7 @@ select = [
 "attacks/**" = ["T201", "E501", "S101"]
 "forensics/**" = ["T201", "E501", "S101"]
 "scripts/**" = ["T201", "E501"]
+"bench/**" = ["T201", "E501"]
 
 # --------------------------------------------------------------------------- mypy
 # The brief requires strict mode for crypto/ and protocol/. We apply it to the whole

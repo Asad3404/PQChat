@@ -107,12 +107,14 @@ def bench_handshakes(runs: int) -> pd.DataFrame:
             bob = fresh_bob(now)
             bundle = bob.bundle()
             gc.disable()
-            (a_sess, first), a_ms, a_cpu = timed(
-                lambda: Session.initiate(alice, bundle, b"hello", mode=mode, policy=POLICY, now=now)
-            )  # noqa: B023
-            (_, _pt), b_ms, b_cpu = timed(
-                lambda: Session.accept(bob, first, policy=POLICY, now=now)
-            )  # noqa: B023
+            (_, first), a_ms, a_cpu = timed(
+                lambda bundle=bundle, mode=mode: Session.initiate(
+                    alice, bundle, b"hello", mode=mode, policy=POLICY, now=now
+                )
+            )
+            _, b_ms, b_cpu = timed(
+                lambda bob=bob, first=first: Session.accept(bob, first, policy=POLICY, now=now)
+            )
             gc.enable()
             rows.append(
                 {
