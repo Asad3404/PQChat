@@ -18,7 +18,7 @@ htmlcov/
 # Local secrets / key stores must never be committed
 *.keystore
 .env
-data/
+/data/   # local client data; anchored so tests/vectors/data/ is NOT ignored
 
 # Editors / OS
 .idea/
