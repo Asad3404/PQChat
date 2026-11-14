@@ -33,6 +33,10 @@ dev = [
     "pip-audit==2.10.1",
     "pre-commit==4.7.0",
 ]
+bench = [
+    "pandas==3.1.1",        # benchmark tables (PROJECT-BRIEF.md §6)
+    "matplotlib==3.11.2",   # benchmark plots
+]
 # Semgrep is installed separately (see CI and README) because it pins many of its own
 # dependencies and would otherwise conflict with the runtime set.
 
