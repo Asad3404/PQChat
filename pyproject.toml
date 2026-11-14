@@ -81,6 +81,7 @@ select = [
 "tests/**" = ["S101"]   # assert is how pytest works
 # Attack scripts are command-line tools: printing results is their purpose (library code keeps T20).
 "attacks/**" = ["T201", "E501", "S101"]
+"forensics/**" = ["T201", "E501", "S101"]
 
 # --------------------------------------------------------------------------- mypy
 # The brief requires strict mode for crypto/ and protocol/. We apply it to the whole
