@@ -99,3 +99,65 @@ def test_frontend_never_injects_html() -> None:
     )
     assert not re.search(r"\son[a-z]+=|<script>|style=", html)
     assert not re.search(r"https?://", html.replace("http://www.w3.org", ""))
+
+
+def test_unlock_form_never_puts_the_passphrase_in_a_url() -> None:
+    """ZAP finding 10024 (M8): a method-less form submits fields as a GET query string."""
+    html = (STATIC / "index.html").read_text()
+    form = re.search(r'<form id="unlock-form"[^>]*>', html)
+    assert form is not None and 'method="post"' in form.group(0)
+
+
+def test_post_to_root_does_not_accept_form_data(ui: str) -> None:
+    status, _, _ = call(ui, "/", {}, {"username": "x", "passphrase": "y"})
+    assert status == 405
+
+
+def test_relay_errors_map_to_meaningful_status_codes(tmp_path: Path) -> None:
+    """ZAP finding (M8): 'user does not exist' must not look like a server failure."""
+    import asyncio
+
+    from pqchat.client.app import create_ui as _create
+    from pqchat.client.relay_client import RelayError
+
+    client = ChatClient(tmp_path, "ws://127.0.0.1:1/ws")
+    app = _create(client, TOKEN, {"x"})
+    assert app is not None
+    from fastapi import HTTPException
+
+    def status(code: str) -> int:
+        async def boom(*_: object) -> None:
+            raise RelayError(code)
+
+        client.send_text = boom  # type: ignore[method-assign]
+        route = next(r for r in app.routes if getattr(r, "path", "") == "/api/chat/{name}/send")
+        try:
+            asyncio.run(route.endpoint(name="bob", body=type("B", (), {"text": "hi"})()))  # type: ignore[attr-defined]
+        except HTTPException as e:
+            return e.status_code
+        return 200
+
+    assert status("unknown_user") == 404
+    assert status("no_bundle") == 404
+    assert status("rate_limited") == 429
+    assert status("connection_closed") == 502
+
+
+def test_second_unlock_is_refused(tmp_path: Path) -> None:
+    """ZAP finding (M8): /api/unlock must not reload state or reconnect once unlocked."""
+    import asyncio
+
+    from fastapi import HTTPException
+
+    client = ChatClient(tmp_path, "ws://127.0.0.1:1/ws")
+    client.unlock("alice", "correct horse battery staple")
+    app = create_ui(client, TOKEN, {"x"})
+    route = next(r for r in app.routes if getattr(r, "path", "") == "/api/unlock")
+    body = type("B", (), {"username": "mallory", "passphrase": "another passphrase"})()
+    try:
+        asyncio.run(route.endpoint(body=body))  # type: ignore[attr-defined]
+    except HTTPException as e:
+        assert e.status_code == 409
+    else:
+        raise AssertionError("second unlock was accepted")
+    assert client.state is not None and client.state.username == "alice"
