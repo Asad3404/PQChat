@@ -1,0 +1,26 @@
+// PQ-Chat v1 key schedule (handshake + ratchet). Render: scripts/make_figures.py
+digraph ks {
+  graph [rankdir=TB, fontname="Helvetica", fontsize=11, nodesep=0.3, ranksep=0.45, pad=0.2];
+  node  [shape=box, style="rounded,filled", fillcolor="#ffffff", color="#5b6470", fontname="Helvetica", fontsize=10];
+  edge  [color="#5b6470", fontname="Helvetica", fontsize=8];
+  subgraph cluster_in { label="inputs"; style=invis;
+    dh [label="DH1 · DH2 · DH3 · DH4\n(X25519)", fillcolor="#f2f2f2"];
+    ss [label="SS\n(ML-KEM-768)", fillcolor="#ece6f5"];
+    f  [label="F = 0xFF × 32", fillcolor="#f2f2f2"];
+  }
+  sk  [label="SK = HKDF-SHA256(salt 0³², F‖DH1‖…‖SS,\n\"PQChat-v1 X25519 MLKEM768 SHA256 AES256GCM\")", fillcolor="#e8eef7"];
+  split [label="HKDF(SK, \"…handshake split\", 64)"];
+  km  [label="k_msg\n(first message, used once)"];
+  rk0 [label="RK₀\n(initial root key)", fillcolor="#e8eef7"];
+  root [label="(RK, CK) = HKDF(salt RK, DH_out [‖ SS_kem])\n\"…ratchet root\" / \"…ratchet root pq\"", fillcolor="#e8eef7"];
+  dhr [label="DH ratchet output", fillcolor="#f2f2f2"];
+  kem [label="ML-KEM re-key secret\n(every K = 4 DH steps)", fillcolor="#ece6f5"];
+  ck  [label="chain key CK"];
+  mk  [label="MK = HMAC(CK, \"…chain message\")\nCK' = HMAC(CK, \"…chain next\")"];
+  aes [label="AES-256-GCM key + nonce\nHKDF(MK, \"…message keys\", 44)"];
+  {dh ss f} -> sk -> split;
+  split -> km; split -> rk0;
+  rk0 -> root; dhr -> root; kem -> root [style=dashed];
+  root -> ck -> mk -> aes;
+  root -> root [label="next step", style=dotted];
+}
