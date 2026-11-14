@@ -1,0 +1,15 @@
+model/scenario                           result    expected   seconds 
+hybrid-secrecy                           true      true           180 
+hybrid-auth                              true      true           249 
+hybrid-forward-secrecy                   true      true           191 
+hybrid-hndl                              true      true           190 
+hybrid-x25519-ed25519-broken-secrecy     true      true           107 
+hybrid-x25519-ed25519-broken-auth        false     false           63 
+hybrid-mlkem-mldsa-broken-secrecy        true      true           216 
+hybrid-mlkem-mldsa-broken-auth           true      true           515 
+hybrid-all-broken-secrecy                false     false           27 
+classical-secrecy                        true      true             1 
+classical-auth                           true      true             2 
+classical-forward-secrecy                true      true             3 
+classical-hndl                           false     false            2 
+ratchet-pcs-m1-m2c-m2                    false false true false false true        0 
