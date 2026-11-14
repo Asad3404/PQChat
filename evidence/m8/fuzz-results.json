@@ -1,0 +1,82 @@
+{
+  "wire.parse (relay side)": {
+    "inputs": 20000,
+    "accepted": 3438,
+    "rejected": 16562,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 10.2
+  },
+  "PrekeyBundle.decode": {
+    "inputs": 20000,
+    "accepted": 8429,
+    "rejected": 11571,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 11.7
+  },
+  "IdentityPublic.decode": {
+    "inputs": 20000,
+    "accepted": 8200,
+    "rejected": 11800,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 10.8
+  },
+  "decode_prekey": {
+    "inputs": 20000,
+    "accepted": 8137,
+    "rejected": 11863,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 10.8
+  },
+  "handshake.parse_initial": {
+    "inputs": 20000,
+    "accepted": 8194,
+    "rejected": 11806,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 11.4
+  },
+  "handshake.respond (full)": {
+    "inputs": 20000,
+    "accepted": 1,
+    "rejected": 19999,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 15.0
+  },
+  "ratchet.parse_message": {
+    "inputs": 20000,
+    "accepted": 8326,
+    "rejected": 11674,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 11.4
+  },
+  "Session.decrypt (full)": {
+    "inputs": 20000,
+    "accepted": 1,
+    "rejected": 19999,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 12.2
+  },
+  "padding.unpad": {
+    "inputs": 20000,
+    "accepted": 667,
+    "rejected": 19333,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 10.6
+  },
+  "keystore header": {
+    "inputs": 20000,
+    "accepted": 0,
+    "rejected": 20000,
+    "unexpected": [],
+    "result": "pass",
+    "seconds": 10.3
+  }
+}

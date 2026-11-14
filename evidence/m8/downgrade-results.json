@@ -1,0 +1,8 @@
+{
+  "relay_strips_kem_prekeys": "blocked: DowngradeError",
+  "mode_byte_only/default_policy": "blocked: DowngradeError",
+  "mode_byte_only/classical_allowed": "blocked: DowngradeError",
+  "mode_and_suite/default_policy": "blocked: ParseError",
+  "mode_and_suite/classical_allowed": "blocked: ParseError",
+  "passed": true
+}
