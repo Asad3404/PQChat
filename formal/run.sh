@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Run every ProVerif scenario and compare with the results the design predicts.
 #
-# Exit code 1 if any query differs from its expected result. CLAUDE.md §8 says CI fails when a
+# Exit code 1 if any query differs from its expected result. PROJECT-BRIEF.md §8 says CI fails when a
 # query that should hold returns false; we also fail when a query that should FAIL (an attack we
 # expect, e.g. classical mode vs. harvest-now-decrypt-later) suddenly holds, because that would
 # mean the model no longer tests what we think it tests.

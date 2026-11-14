@@ -2,7 +2,7 @@
 
 This is the "known-good" check that runs in CI, in the Docker images and at client
 start-up. It deliberately prints *only* pass/fail and public sizes, never key
-material or shared secrets (CLAUDE.md §3.4).
+material or shared secrets (PROJECT-BRIEF.md §3.4).
 
 Note: Milestone 2 introduces the real wrappers in ``pqchat.crypto``; this module
 will then call those wrappers instead of ``oqs`` directly.
@@ -37,7 +37,7 @@ def _kem_roundtrip() -> bool:
         with oqs.KeyEncapsulation(KEM_ALG) as sender:
             ciphertext, ss_sender = sender.encap_secret(public_key)
         ss_receiver = receiver.decap_secret(ciphertext)
-    # Constant-time comparison even in a self-test: good habit (CLAUDE.md §3.3).
+    # Constant-time comparison even in a self-test: good habit (PROJECT-BRIEF.md §3.3).
     return bool(hmac.compare_digest(ss_sender, ss_receiver))
 
 

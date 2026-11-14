@@ -1,6 +1,6 @@
 # Attack suite (Milestone 8)
 
-Attack only this system, locally or in the Compose network, with synthetic accounts (CLAUDE.md §10).
+Attack only this system, locally or in the Compose network, with synthetic accounts (PROJECT-BRIEF.md §10).
 Results and CVSS scores: `docs/pentest-report.md`. Evidence: `evidence/m8/`.
 
 Attack tools live in their own virtualenv so they never mix with PQ-Chat's pinned dependencies:

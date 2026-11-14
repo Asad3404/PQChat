@@ -1,4 +1,4 @@
-"""PQ-Chat relay: untrusted store-and-forward server (CLAUDE.md §4 A2, M6).
+"""PQ-Chat relay: untrusted store-and-forward server (PROJECT-BRIEF.md §4 A2, M6).
 
 One WebSocket endpoint, ``/ws``, carrying JSON envelopes (``pqchat.wire``):
 

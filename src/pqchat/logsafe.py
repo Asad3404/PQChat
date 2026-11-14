@@ -1,4 +1,4 @@
-"""Logging that cannot leak secrets (SR-25, CLAUDE.md §3.4).
+"""Logging that cannot leak secrets (SR-25, PROJECT-BRIEF.md §3.4).
 
 ``RedactingFilter`` rewrites every log record before it is emitted:
 

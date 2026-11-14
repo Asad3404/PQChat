@@ -4,7 +4,7 @@
 **Spec:** the normative description is [`docs/protocol-spec.md`](../protocol-spec.md); this note records
 the design choices and their reasons.
 
-## Approved changes to CLAUDE.md §5 (2026-11-06, "adopt all 6")
+## Approved changes to PROJECT-BRIEF.md §5 (2026-11-06, "adopt all 6")
 
 | Req | Change | Where |
 |---|---|---|
@@ -13,7 +13,7 @@ the design choices and their reasons.
 | SR-17 | Safety numbers over both users' identity keys (`protocol/safety.py`); UI in M6. | new |
 | SR-21 / SR-20 / SR-27 | Relay auth, retention, encrypted history | M6 |
 
-Recorded in [ADR-002](../decisions/ADR-002-protocol-v1-changes.md); CLAUDE.md §5 updated to match.
+Recorded in [ADR-002](../decisions/ADR-002-protocol-v1-changes.md); PROJECT-BRIEF.md §5 updated to match.
 
 ## Decisions
 
@@ -27,7 +27,7 @@ Recorded in [ADR-002](../decisions/ADR-002-protocol-v1-changes.md); CLAUDE.md §
 | D6 | SK is split with HKDF into a one-time first-message key and the initial ratchet root key. The first-message AEAD nonce is all zeros, which is safe because that key is used exactly once. | Clean hand-over to the M5 ratchet; never reuse SK directly. |
 | D7 | Replay cache keyed on SHA-256 of the initial-message *header*, kept until the newest signed-prekey lifetime has passed. | SR-11. With a one-time prekey, deletion already stops replays (SR-10); the cache covers last-resort prekeys. |
 | D8 | Time is passed in as an argument (`now`), never read inside protocol code. | Deterministic tests for expiry; no hidden clock. |
-| D9 | `pq-only`: no DH. Alice signs the transcript (header + Bob's identity) with ML-DSA-65. | Matches CLAUDE.md §5.4; loss of deniability documented. |
+| D9 | `pq-only`: no DH. Alice signs the transcript (header + Bob's identity) with ML-DSA-65. | Matches PROJECT-BRIEF.md §5.4; loss of deniability documented. |
 
 ## Tests planned → files
 

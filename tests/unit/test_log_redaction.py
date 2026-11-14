@@ -1,4 +1,4 @@
-"""SR-25 / CLAUDE.md §3.4: secrets never reach log output."""
+"""SR-25 / PROJECT-BRIEF.md §3.4: secrets never reach log output."""
 
 from __future__ import annotations
 

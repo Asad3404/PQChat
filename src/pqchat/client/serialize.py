@@ -1,4 +1,4 @@
-"""Explicit JSON (de)serialisation of client state. No pickle (CLAUDE.md §3.6).
+"""Explicit JSON (de)serialisation of client state. No pickle (PROJECT-BRIEF.md §3.6).
 
 The resulting document contains private keys and plaintext history, so it is only ever written
 to disk encrypted (``pqchat.crypto.keystore_crypto``). AEAD guarantees integrity, so decoding

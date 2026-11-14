@@ -11,7 +11,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require("playwright"); // resolved via NODE_PATH or a local install
 
 const [aliceUrl, bobUrl, out = "evidence/m6"] = process.argv.slice(2);
-const PASS = "synthetic demo passphrase"; // synthetic test account only (CLAUDE.md §10)
+const PASS = "synthetic demo passphrase"; // synthetic test account only (PROJECT-BRIEF.md §10)
 
 const browser = await chromium.launch();
 const mk = async () => (await browser.newContext({ viewport: { width: 1180, height: 720 }, deviceScaleFactor: 2 })).newPage();

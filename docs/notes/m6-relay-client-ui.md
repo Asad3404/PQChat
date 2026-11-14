@@ -18,7 +18,7 @@ flowchart LR
 
 | # | Decision | Why |
 |---|---|---|
-| D1 | One WebSocket endpoint with JSON envelopes (`pqchat/wire.py`), shared schema for client and relay | CLAUDE.md §5.5; one strict parser to test and fuzz (M8) |
+| D1 | One WebSocket endpoint with JSON envelopes (`pqchat/wire.py`), shared schema for client and relay | PROJECT-BRIEF.md §5.5; one strict parser to test and fuzz (M8) |
 | D2 | Relay login = signature with **both** identity keys over `(purpose, username, fresh nonce)` under label `SIG_RELAY_AUTH` | No passwords on an untrusted server; post-quantum authentication; nonce prevents replay (SR-21) |
 | D3 | A username is bound to the identity that registered it first | Prevents squatting/hijack of an existing name (T-18) |
 | D4 | Relay re-verifies uploaded prekeys (both signatures, expiry) | Stops the relay from being used to distribute junk; clients still verify everything themselves |

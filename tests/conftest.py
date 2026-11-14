@@ -1,4 +1,4 @@
-"""Shared fixtures: synthetic users with identities and prekeys (CLAUDE.md §10)."""
+"""Shared fixtures: synthetic users with identities and prekeys (PROJECT-BRIEF.md §10)."""
 
 from __future__ import annotations
 

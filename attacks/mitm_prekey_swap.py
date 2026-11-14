@@ -8,7 +8,7 @@ Mode (environment variable PQCHAT_ATTACK):
   swap-identity  replace the whole bundle with Mallory's own valid bundle under Bob's name (T-02)
 
 In swap-identity mode the addon also tries to decrypt Alice's initial message with Mallory's keys and
-writes what it recovered to PQCHAT_ATTACK_LOG. Only synthetic accounts are used (CLAUDE.md §10).
+writes what it recovered to PQCHAT_ATTACK_LOG. Only synthetic accounts are used (PROJECT-BRIEF.md §10).
 """
 
 from __future__ import annotations

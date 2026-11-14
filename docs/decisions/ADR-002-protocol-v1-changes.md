@@ -5,7 +5,7 @@
 
 ## Context
 
-The M1 threat model (§10) found six gaps in the version-1 design of CLAUDE.md §5. CLAUDE.md §2
+The M1 threat model (§10) found six gaps in the version-1 design of PROJECT-BRIEF.md §5. PROJECT-BRIEF.md §2
 rule 4 requires approval before changing §5. The student approved all six recommendations.
 
 ## Decision
@@ -19,7 +19,7 @@ rule 4 requires approval before changing §5. The student approved all six recom
 | SR-20 | Relay deletes on delivery, max retention 30 days | No (relay, M6) |
 | SR-27 | Message history encrypted under a key-store-derived key | No (client, M6) |
 
-CLAUDE.md §5.1 and §5.2 were updated to match; `docs/protocol-spec.md` is normative.
+PROJECT-BRIEF.md §5.1 and §5.2 were updated to match; `docs/protocol-spec.md` is normative.
 
 ## Consequences
 

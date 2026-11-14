@@ -2,5 +2,5 @@
 
 __version__ = "0.0.1"
 
-#: Wire-protocol version byte (CLAUDE.md §5.5). Bumped only with a protocol change.
+#: Wire-protocol version byte (PROJECT-BRIEF.md §5.5). Bumped only with a protocol change.
 PROTOCOL_VERSION = 1

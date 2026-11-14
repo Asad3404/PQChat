@@ -1,13 +1,13 @@
 # ADR-003: Alice's first double-ratchet message travels inside the handshake
 
 * **Status:** accepted by the implementer during M6 (2026-11-09); **needs the student's review**,
-  because it refines CLAUDE.md §5.2 step 6.
+  because it refines PROJECT-BRIEF.md §5.2 step 6.
 * **Date:** 2026-11-09
 
 ## Context
 
 In the first implementation the initial message encrypted the user's first plaintext directly
-under `k_msg` (CLAUDE.md §5.2 step 6). The ratchet started only afterwards, so Bob's ratchet had no
+under `k_msg` (PROJECT-BRIEF.md §5.2 step 6). The ratchet started only afterwards, so Bob's ratchet had no
 sending chain until he received a ratchet message from Alice. When Bob wanted to reply first, the
 client silently ran a second handshake in the opposite direction. Visible symptom in the M6
 screenshot: Alice's one-time prekey count dropped to 49 although only she had started a chat.

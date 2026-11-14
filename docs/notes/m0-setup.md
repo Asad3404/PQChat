@@ -6,7 +6,7 @@
 ## Goal
 
 Create a reproducible, secure-by-default foundation, so every later milestone builds on
-the same pinned tools. "Done when" (CLAUDE.md §9): CI is green; `docker compose up`
+the same pinned tools. "Done when" (PROJECT-BRIEF.md §9): CI is green; `docker compose up`
 starts a relay stub; an ML-KEM-768 round-trip test passes.
 
 ## Decisions
@@ -18,9 +18,9 @@ starts a relay stub; an ML-KEM-768 round-trip test passes.
 | D3 | liboqs-python **0.16.0.2** (matches the C library's minor version) | A mismatch makes liboqs-python warn, and our pytest config turns warnings into errors. |
 | D4 | Direct dependencies pinned exactly in `pyproject.toml`; **all** transitive dependencies pinned in `requirements/constraints.txt` | Benchmarks (M11) and Docker images must be reproducible. pip-audit scans the full constraints file, not just the direct dependencies. |
 | D5 | Semgrep installed in its own virtualenv | It pins many of its own dependencies and would conflict with the runtime set. |
-| D6 | Project-specific Semgrep rules (`.semgrep/pqchat-rules.yml`) with rule self-tests | Turns CLAUDE.md §3 rules (no `random`, no pickle/eval, constant-time comparison, no raw hazmat ciphers) into checks that run on every commit. |
+| D6 | Project-specific Semgrep rules (`.semgrep/pqchat-rules.yml`) with rule self-tests | Turns PROJECT-BRIEF.md §3 rules (no `random`, no pickle/eval, constant-time comparison, no raw hazmat ciphers) into checks that run on every commit. |
 | D7 | mypy **strict for the whole package**, not just `crypto/` and `protocol/` | Stricter than required, at almost no cost. |
-| D8 | ruff `T20` rule bans `print()` in library code | Stray `print()` debugging is a common way secrets end up in logs (CLAUDE.md §3.4). |
+| D8 | ruff `T20` rule bans `print()` in library code | Stray `print()` debugging is a common way secrets end up in logs (PROJECT-BRIEF.md §3.4). |
 | D9 | Docker: two-stage build, base image pinned **by digest**, non-root user (uid 10001), read-only root FS, `cap_drop: ALL`, `no-new-privileges`, port published on 127.0.0.1 only | Defence in depth for the relay container; the runtime image has no compiler or git, so liboqs-python cannot silently fetch and build another liboqs. |
 | D10 | Relay stub disables `/docs`, `/redoc`, `/openapi.json` and the `Server` header | An untrusted, internet-facing relay should not advertise its API or software version. |
 | D11 | Self-test runs during `docker build` | A broken PQ library fails the build instead of failing at runtime. |

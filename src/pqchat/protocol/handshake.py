@@ -1,4 +1,4 @@
-"""PQXDH-style hybrid handshake (CLAUDE.md §5.2, docs/protocol-spec.md §4).
+"""PQXDH-style hybrid handshake (PROJECT-BRIEF.md §5.2, docs/protocol-spec.md §4).
 
 Initial message::
 

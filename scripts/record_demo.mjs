@@ -4,7 +4,7 @@
 //   node scripts/record_demo.mjs "<alice link>" "<bob link>" <out-dir>
 // Writes <out-dir>/alice.webm, <out-dir>/bob.webm and <out-dir>/timeline.json (captions with
 // start times in seconds). scripts/make_demo_video.py turns them into the final MP4.
-// Synthetic accounts and messages only (CLAUDE.md §10).
+// Synthetic accounts and messages only (PROJECT-BRIEF.md §10).
 import { createRequire } from "node:module";
 import { mkdirSync, renameSync, writeFileSync } from "node:fs";
 

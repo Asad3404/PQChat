@@ -52,7 +52,7 @@ metadata already accepted in the threat model (T-15).
 
 * The scenario is synthetic and small; a long-running relay would also need its filesystem's
   unallocated space and backups examined (`secure_delete` only covers SQLite's own pages).
-* Memory forensics of a running client is out of scope (CLAUDE.md §4); best-effort zeroisation in
+* Memory forensics of a running client is out of scope (PROJECT-BRIEF.md §4); best-effort zeroisation in
   Python cannot guarantee secrets are gone from RAM (T-27).
 * Real deployments may log IP addresses at the reverse proxy; PQ-Chat's relay logs neither IPs nor
   usernames.

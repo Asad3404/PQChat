@@ -18,5 +18,5 @@ def test_registry_contains_every_module_constant() -> None:
 
 
 def test_handshake_info_matches_spec() -> None:
-    """CLAUDE.md §5.2 step 4 fixes this exact string."""
+    """PROJECT-BRIEF.md §5.2 step 4 fixes this exact string."""
     assert labels.HANDSHAKE_SK == b"PQChat-v1 X25519 MLKEM768 SHA256 AES256GCM"

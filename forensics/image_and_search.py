@@ -18,7 +18,7 @@ Steps (classic acquisition -> verification -> analysis):
    secret in four encodings: raw, hex, base64, base64url.
 3. Structured analysis of the relay database: tables, row counts, which columns hold what.
 
-Output: <case>/report.json and a summary on stdout. Synthetic data only (CLAUDE.md §10).
+Output: <case>/report.json and a summary on stdout. Synthetic data only (PROJECT-BRIEF.md §10).
 """
 
 from __future__ import annotations

@@ -13,4 +13,4 @@ Analysis and results: `docs/notes/m7-network.md` §2. Reproduce the checks:
     grep -c -a -F "Hi Bob" tls-session.pcap          # 0
     grep -c -a -F '"from":"alice"' no-tls-e2e-only.pcap   # 2: sender metadata without TLS
 
-All accounts and messages are synthetic (CLAUDE.md §10).
+All accounts and messages are synthetic (PROJECT-BRIEF.md §10).

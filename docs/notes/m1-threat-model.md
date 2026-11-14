@@ -7,7 +7,7 @@
 ## Goal
 
 Before any protocol code exists, write down what we protect, from whom, how it could be
-attacked and what the system must do about it. "Done when" (CLAUDE.md §9): **every
+attacked and what the system must do about it. "Done when" (PROJECT-BRIEF.md §9): **every
 security requirement has an ID and a planned test.**
 
 ## Method
@@ -16,7 +16,7 @@ security requirement has an ID and a planned test.**
 |---|---|---|
 | 1. Scope | Assets (AS-n), assumptions (ASM-n), out-of-scope list | A threat model is only meaningful relative to what is protected and what is assumed. |
 | 2. Model the system | Data-flow diagram (Mermaid) with elements E1–E7 and trust boundaries TB-1–TB-6 | Attacks happen where data crosses a trust boundary; the diagram makes those crossings visible. |
-| 3. Attackers | A1–A4 from CLAUDE.md §4, each with "can / cannot / how modelled in ProVerif" | Fixing capabilities now means M4 (ProVerif) and M8 (pentest) test against the *same* attackers. |
+| 3. Attackers | A1–A4 from PROJECT-BRIEF.md §4, each with "can / cannot / how modelled in ProVerif" | Fixing capabilities now means M4 (ProVerif) and M8 (pentest) test against the *same* attackers. |
 | 4. Find threats | **STRIDE-per-element** (Microsoft SDL; Shostack, *Threat Modeling*, 2014) | Systematic: every element is checked against all six categories, so whole classes of threat are not forgotten. |
 | 5. Prioritise | **Risk register**, likelihood × impact on a 1–5 scale (5 × 5 matrix, ISO 31000 / NIST SP 800-30 style), scored before and after mitigation | Simple, explainable in a viva, and shows the *effect* of each control (inherent → residual risk). DREAD was not used: it is deprecated by Microsoft for being too subjective. |
 | 6. Requirements | **SR-n**: one testable statement each, with threats, milestone, planned verification and status | Gives the traceability chain threat → requirement → code → test/proof → evidence. |
@@ -36,7 +36,7 @@ security requirement has an ID and a planned test.**
 
 ## Findings that need a decision (summary — details in threat-model.md §9)
 
-The analysis found gaps in the version-1 protocol of CLAUDE.md §5. Requirements that close
+The analysis found gaps in the version-1 protocol of PROJECT-BRIEF.md §5. Requirements that close
 them are marked **Proposed** and are *not* adopted until the student approves:
 
 * **SR-17** safety numbers + key-change warnings (the relay can otherwise swap a user's *identity* keys on first contact).

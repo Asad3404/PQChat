@@ -1,4 +1,4 @@
-"""Strict binary encoding (CLAUDE.md §5.5, SR-8, SR-9).
+"""Strict binary encoding (PROJECT-BRIEF.md §5.5, SR-8, SR-9).
 
 * Integers are big-endian and range-checked.
 * Every public key is written as ``alg_id || key`` with the exact length for that algorithm.

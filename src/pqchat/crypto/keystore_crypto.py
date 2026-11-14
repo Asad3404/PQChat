@@ -1,4 +1,4 @@
-"""Passphrase-based encryption of the private key store (SR-26, CLAUDE.md §3.10).
+"""Passphrase-based encryption of the private key store (SR-26, PROJECT-BRIEF.md §3.10).
 
 Format (all integers big-endian)::
 

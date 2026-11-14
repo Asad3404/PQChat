@@ -1,4 +1,4 @@
-"""Published test vectors for the classical primitives (CLAUDE.md §8)."""
+"""Published test vectors for the classical primitives (PROJECT-BRIEF.md §8)."""
 
 from __future__ import annotations
 

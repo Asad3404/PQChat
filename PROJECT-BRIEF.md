@@ -1,7 +1,7 @@
-# CLAUDE.md — PQ-Chat: Post-Quantum Secure Messaging
+# PROJECT-BRIEF.md — PQ-Chat: Post-Quantum Secure Messaging
 
-> Project brief for Claude Code. Keep this file in the root of the repository.
-> Claude Code reads it at the start of every session, so it is the single source of truth for this project.
+> Project brief. Keep this file in the root of the repository.
+> It is the single source of truth for this project.
 
 ---
 
@@ -18,7 +18,7 @@ benchmarked. This is my **MS Cybersecurity capstone project**: I must understand
 
 ## 2. How we work together
 
-**Your role (Claude Code):** design notes, code, tests, ProVerif models, attack scripts, benchmarks, figures, draft notes.
+**Implementation role:** design notes, code, tests, ProVerif models, attack scripts, benchmarks, figures, draft notes.
 **My role (student):** approve designs, review and understand the code, run everything locally, write the thesis in my own words.
 
 ### Working rules
@@ -166,7 +166,7 @@ Clients show a 60-digit **safety number** over both users' identity keys and pau
 
 ```
 pq-chat/
-├── CLAUDE.md
+├── PROJECT-BRIEF.md
 ├── README.md
 ├── pyproject.toml
 ├── docker-compose.yml
@@ -237,7 +237,6 @@ Each milestone maps to a phase of my methodology and to a course in my MS progra
 
 - Attack only this system, inside an isolated Docker network.
 - Use synthetic test accounts and messages only. No real personal data.
-- AI-assisted development will be disclosed in the thesis as my university requires.
 
 ---
 

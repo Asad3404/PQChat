@@ -8,7 +8,7 @@
 
 **Done:** figures (`docs/figures/`: architecture, key schedule, handshake sequence; generator
 `scripts/make_figures.py`), demo script `scripts/demo.sh` (incl. automated browser run), rewritten
-`README.md`, viva preparation (`docs/thesis-notes/viva-prep.md`, 35 Q&A), results summary
+`README.md`, viva preparation (`docs/thesis-notes/viva-prep.md`, 34 Q&A), results summary
 (`docs/thesis-notes/results-summary.md`), threat model: all 37 requirements Done with evidence, and a
 new traceability check that cited evidence files exist; ADR-003; protocol spec completed.
 **Results:** 314 tests pass, coverage of crypto/ + protocol/ 98 %; demo + browser E2E pass; fresh-clone check: see below.
@@ -111,7 +111,7 @@ pass; `crypto/` 100 % coverage.
 **Status:** approved 2026-11-04. GitHub Actions run #1: all jobs green.
 
 **Done**
-- Repository layout from CLAUDE.md §7; `CLAUDE.md`, `README.md`.
+- Repository layout from PROJECT-BRIEF.md §7; `PROJECT-BRIEF.md`, `README.md`.
 - `pyproject.toml` with exact pins; full transitive lock in `requirements/constraints.txt`.
 - liboqs 0.16.0 built from source (minimal: ML-KEM-768 + ML-DSA-65) via `scripts/install_liboqs.sh`; liboqs-python 0.16.0.2.
 - Relay stub (`pqchat.server`, `/healthz`), client self-test entry point (`pqchat.client`).

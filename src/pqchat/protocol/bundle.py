@@ -1,4 +1,4 @@
-"""Identity keys, signed prekeys and prekey bundles (CLAUDE.md §5.1, SR-5, SR-10, SR-18).
+"""Identity keys, signed prekeys and prekey bundles (PROJECT-BRIEF.md §5.1, SR-5, SR-10, SR-18).
 
 Wire formats (see docs/protocol-spec.md §3):
 

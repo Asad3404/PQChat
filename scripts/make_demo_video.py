@@ -178,7 +178,7 @@ def end_card(path: Path) -> Path:
     ax.text(
         W / 2,
         540,
-        "git clone https://github.com/Asad3404/PQChat.git",
+        "git clone <repository-url> PQChat",
         fontsize=30,
         color=SUB,
         ha="center",

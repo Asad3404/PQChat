@@ -1,4 +1,4 @@
-"""Registry of every domain-separation label (SR-16, CLAUDE.md §3.7).
+"""Registry of every domain-separation label (SR-16, PROJECT-BRIEF.md §3.7).
 
 Each HKDF ``info``, HMAC input prefix and signature label used anywhere in PQ-Chat is
 defined here, once. ``tests/unit/test_labels.py`` checks that they are unique and all start
@@ -10,7 +10,7 @@ from __future__ import annotations
 PREFIX = b"PQChat-v1"
 
 # --- Handshake (M3) -------------------------------------------------------------------
-#: HKDF info for the session key SK, exactly as in CLAUDE.md §5.2 step 4.
+#: HKDF info for the session key SK, exactly as in PROJECT-BRIEF.md §5.2 step 4.
 HANDSHAKE_SK = b"PQChat-v1 X25519 MLKEM768 SHA256 AES256GCM"
 #: Same for the benchmark-only modes, so keys from different modes can never coincide.
 HANDSHAKE_SK_CLASSICAL = b"PQChat-v1 X25519 SHA256 AES256GCM"

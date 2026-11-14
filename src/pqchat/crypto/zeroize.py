@@ -1,4 +1,4 @@
-"""Best-effort erasure of secrets held in mutable buffers (SR-15, CLAUDE.md §3.11).
+"""Best-effort erasure of secrets held in mutable buffers (SR-15, PROJECT-BRIEF.md §3.11).
 
 Python limits: ``bytes`` are immutable and may be copied by the interpreter, the
 allocator or the C libraries, so only our own ``bytearray`` buffers can be overwritten.

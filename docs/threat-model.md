@@ -42,12 +42,12 @@ PQ-Chat has three kinds of component:
 | ASM-1 | At least one of X25519 (CDH) or ML-KEM-768 (MLWE) is secure; SHA-256/HKDF/HMAC and AES-256-GCM are secure, also against a quantum attacker (Grover only halves the security level of AES-256, which leaves 128 bits). |
 | ASM-2 | liboqs 0.16.0 and pyca/cryptography implement their algorithms correctly (we test vectors, but do not audit their C code). |
 | ASM-3 | The OS random number generator (`os.urandom`) is secure. |
-| ASM-4 | The endpoint is not running malware with live memory access while it is in use (out of scope, CLAUDE.md §4). |
+| ASM-4 | The endpoint is not running malware with live memory access while it is in use (out of scope, PROJECT-BRIEF.md §4). |
 | ASM-5 | Users choose a key-store passphrase of reasonable strength. |
 | ASM-6 | Device clocks are correct to within about a day (only needed for prekey expiry, SR-18). |
 | ASM-7 | Users who want protection against a malicious relay on first contact compare safety numbers out-of-band (SR-17). |
 
-**Out of scope** (CLAUDE.md §4): malware with live memory access on the endpoint, anonymity against
+**Out of scope** (PROJECT-BRIEF.md §4): malware with live memory access on the endpoint, anonymity against
 global traffic analysis, multi-device sync, group chats. Physical side channels (power, EM) are also out of scope.
 
 ## 4. Data-flow diagram
@@ -215,7 +215,7 @@ Likelihood (L) and impact (I) are scored 1–5; **score = L × I**. Bands: **1�
 | T-25 | 2 | 5 | 10 | Mitigate | SR-14 | 2 | 3 | 6 | Against A4, recovery waits for the next PQ re-key (up to K DH ratchet steps). |
 | T-26 | 3 | 4 | 12 | Mitigate | SR-27 | 2 | 4 | 8 | |
 | T-27 | 2 | 4 | 8 | Accept | SR-15 | 2 | 4 | 8 | Python cannot guarantee erasure (immutable bytes, garbage collector copies). Best-effort zeroisation; documented limitation. |
-| T-28 | 1 | 4 | 4 | Accept | SR-3, SR-35 | 1 | 4 | 4 | Secret-dependent math stays in C libraries; Python itself is not constant-time (CLAUDE.md §3.12). |
+| T-28 | 1 | 4 | 4 | Accept | SR-3, SR-35 | 1 | 4 | 4 | Secret-dependent math stays in C libraries; Python itself is not constant-time (PROJECT-BRIEF.md §3.12). |
 | T-29 | 3 | 5 | 15 | Mitigate | SR-28 | 1 | 5 | 5 | |
 | T-30 | 3 | 5 | 15 | Mitigate | SR-29 | 1 | 5 | 5 | |
 | T-31 | 2 | 4 | 8 | Mitigate | SR-28 | 1 | 4 | 4 | |
@@ -277,7 +277,7 @@ As of Milestone 12 every requirement is Done.
 
 ## 10. Findings and decisions needed
 
-The analysis found six places where the version-1 design (CLAUDE.md §5) is silent or weaker
+The analysis found six places where the version-1 design (PROJECT-BRIEF.md §5) is silent or weaker
 than it should be. Each has a **Proposed** requirement above; none is adopted without approval.
 
 1. **Identity substitution by the relay (T-02 → SR-17).** Signatures prove that prekeys belong to
@@ -292,7 +292,7 @@ than it should be. Each has a **Proposed** requirement above; none is adopted wi
    KEM-key binding enables attacks on the Kyber-based draft; ML-KEM (FIPS 203) mixes a hash of the
    public key into the secret, which helps, but explicit binding is cheap. *Recommendation: adopt.*
    Impact: one extra 32-byte hash in the AD of §5.2 step 5.
-4. **Relay authentication (T-18 → SR-21).** CLAUDE.md does not say how a client proves to the relay
+4. **Relay authentication (T-18 → SR-21).** PROJECT-BRIEF.md does not say how a client proves to the relay
    that it owns an account. *Recommendation: signature over a fresh server challenge.* The detailed
    design goes in the M6 design note.
 5. **Retention (T-14 → SR-20).** *Recommendation: delete on delivery and expire after 30 days.*

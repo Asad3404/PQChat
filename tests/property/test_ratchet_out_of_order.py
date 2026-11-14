@@ -1,4 +1,4 @@
-"""Hypothesis: decrypt(encrypt(m)) == m under reordering and loss (CLAUDE.md §8)."""
+"""Hypothesis: decrypt(encrypt(m)) == m under reordering and loss (PROJECT-BRIEF.md §8)."""
 
 from __future__ import annotations
 

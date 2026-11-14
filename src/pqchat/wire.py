@@ -1,4 +1,4 @@
-"""JSON envelopes between client and relay (CLAUDE.md §5.5, SR-9).
+"""JSON envelopes between client and relay (PROJECT-BRIEF.md §5.5, SR-9).
 
 Every envelope is a JSON object with a ``type`` and a fixed set of fields. ``parse`` checks:
 the total size, that the JSON is an object, that the type is known, that the key set is

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build and install liboqs from source (CLAUDE.md §6: "build from source with CMake").
+# Build and install liboqs from source (PROJECT-BRIEF.md §6: "build from source with CMake").
 #
 # This script is the single source of truth for the liboqs version. It is used by
 #   - local setup (README),

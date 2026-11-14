@@ -1,7 +1,7 @@
 """Fuzz every parser that sees attacker-controlled bytes (SR-9, M8).
 
 Atheris has no wheel for Python 3.12 and its source build failed in this environment, so — as
-CLAUDE.md §6 allows — fuzzing uses Hypothesis: random bytes plus mutations (bit flips, truncation,
+PROJECT-BRIEF.md §6 allows — fuzzing uses Hypothesis: random bytes plus mutations (bit flips, truncation,
 insertion, duplication, splicing) of *valid* messages, so the fuzzer gets past the first checks.
 
 A target passes if every input either parses or raises one of its *expected* error types. Any other

@@ -1,4 +1,4 @@
-"""Protocol modes and local policy (CLAUDE.md §5.4, SR-6, SR-34)."""
+"""Protocol modes and local policy (PROJECT-BRIEF.md §5.4, SR-6, SR-34)."""
 
 from __future__ import annotations
 

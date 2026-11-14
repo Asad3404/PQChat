@@ -5,7 +5,7 @@
 
 ## Context
 
-ML-KEM-768 and ML-DSA-65 come from liboqs (C) through liboqs-python. CLAUDE.md §6 says to
+ML-KEM-768 and ML-DSA-65 come from liboqs (C) through liboqs-python. PROJECT-BRIEF.md §6 says to
 build liboqs from source. Three risks have to be handled:
 
 1. **Version drift.** Distro packages lag behind and might not implement the final FIPS

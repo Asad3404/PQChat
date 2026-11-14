@@ -9,7 +9,7 @@ description = "PQ-Chat: hybrid post-quantum end-to-end encrypted messenger (MS C
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 license = { text = "MIT" }
-# Runtime dependencies (CLAUDE.md §6). Exact pins: the same versions must be used for
+# Runtime dependencies (PROJECT-BRIEF.md §6). Exact pins: the same versions must be used for
 # tests, Docker images and benchmarks so results are reproducible.
 # Transitive dependencies are pinned in requirements/constraints.txt.
 dependencies = [
@@ -34,7 +34,7 @@ dev = [
     "pre-commit==4.7.0",
 ]
 bench = [
-    "pandas==3.1.1",        # benchmark tables (CLAUDE.md §6)
+    "pandas==3.1.1",        # benchmark tables (PROJECT-BRIEF.md §6)
     "matplotlib==3.11.2",   # benchmark plots
 ]
 # Semgrep is installed separately (see CI and README) because it pins many of its own
@@ -78,7 +78,7 @@ select = [
     "N",             # naming
     "SIM",           # simplify
     "RUF",
-    "T20",           # no stray print(): a common way secrets leak (CLAUDE.md §3.4)
+    "T20",           # no stray print(): a common way secrets leak (PROJECT-BRIEF.md §3.4)
 ]
 
 [tool.ruff.lint.per-file-ignores]

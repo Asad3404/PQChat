@@ -1,4 +1,4 @@
-# CI for PQ-Chat (CLAUDE.md §8). The build fails on:
+# CI for PQ-Chat (PROJECT-BRIEF.md §8). The build fails on:
 #   * any failing test,
 #   * a Bandit high-severity finding,
 #   * a Semgrep error,

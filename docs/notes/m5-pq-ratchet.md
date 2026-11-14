@@ -1,7 +1,7 @@
 # Design note — Milestone 5: double ratchet with post-quantum re-keying
 
 **Status:** implemented without a separate approval stop (student chose "no stops, review after" on
-2026-11-06). CLAUDE.md §5.3 normally requires approval of this note before coding; please review
+2026-11-06). PROJECT-BRIEF.md §5.3 normally requires approval of this note before coding; please review
 it with extra care.
 
 ## 1. What we build, and what we do not
@@ -74,7 +74,7 @@ Happens once after receiving a new peer DH key (and once at Alice's start):
 3. `RK, CKs = KDF_RK(RK, DH(DHs, DHr), SS)` (SS omitted when no PQ step).
 
 `K` counts DH ratchet steps of *both* parties (default 4), so each party re-keys every `K/2 = 2` of
-its own sending chains: a PQ secret enters the root chain every 4 DH steps, as CLAUDE.md §5.3 asks.
+its own sending chains: a PQ secret enters the root chain every 4 DH steps, as PROJECT-BRIEF.md §5.3 asks.
 
 ### 5.3 Header
 

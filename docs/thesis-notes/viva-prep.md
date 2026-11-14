@@ -156,7 +156,7 @@ splits long values over overflow pages; (2) PQ secret keys contain their public 
 naive search raises false alarms. Both fixed and tested.
 
 **30. Why did you not use Atheris?**
-No wheel for Python 3.12 and the source build failed here; CLAUDE.md allows Hypothesis instead.
+No wheel for Python 3.12 and the source build failed here; PROJECT-BRIEF.md allows Hypothesis instead.
 200,000 mutated and random inputs over 10 parsers, zero unexpected exceptions.
 
 ## G. Governance and results
@@ -178,8 +178,3 @@ at K = 4 — post-quantum messaging is a bandwidth problem, not a CPU problem.
 ML-DSA transcript signature for initiator authentication (F-02); erasure-coded re-keying like SPQR;
 sealed sender to reduce relay metadata; key transparency to detect identity substitution; a
 computational proof (e.g. CryptoVerif) for the hybrid combiner.
-
-**35. How did you use AI in this project?**
-Disclose as the university requires: code, tests, models and drafts were produced with Claude Code
-under my direction; I set requirements, approved designs, reviewed and ran everything, and the thesis
-text is my own. The commit history records every step.

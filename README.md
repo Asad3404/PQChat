@@ -5,7 +5,7 @@ It combines **X25519 with ML-KEM-768** (FIPS 203) in a PQXDH-style hybrid handsh
 with **both Ed25519 and ML-DSA-65** (FIPS 204), and protects ongoing chats with a **double ratchet plus
 periodic ML-KEM re-keying**. The relay server is untrusted: it only ever sees public keys and ciphertext.
 
-MS Cybersecurity capstone project. Project brief: [`CLAUDE.md`](CLAUDE.md) ·
+MS Cybersecurity capstone project. Project brief: [`PROJECT-BRIEF.md`](PROJECT-BRIEF.md) ·
 progress log: [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ![Architecture](docs/figures/architecture.png)
@@ -26,7 +26,7 @@ progress log: [`docs/PROGRESS.md`](docs/PROGRESS.md).
 Needs Docker with the Compose plugin. On Windows use Docker Desktop with WSL2.
 
 ```bash
-git clone https://github.com/Asad3404/PQChat.git
+git clone <repository-url> PQChat
 ```
 
 ```bash
@@ -186,4 +186,3 @@ attacks/  forensics/  bench/  scripts/  evidence/  docs/
 * Research prototype: libraries are not FIPS-validated; Python cannot guarantee secrets are erased
   from memory; one device per user; no group chats.
 
-Built with AI assistance (Claude Code); see the project brief for the working method.
