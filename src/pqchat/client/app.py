@@ -93,7 +93,10 @@ def create_ui(
         if isinstance(exc, LockedError):
             return HTTPException(423, "locked")
         if isinstance(exc, RelayError):
-            return HTTPException(502, exc.code)
+            # Relay answers about the *request* map to client errors; only a broken relay
+            # connection is a gateway error (ZAP finding, M8).
+            status = {"unknown_user": 404, "no_bundle": 404, "rate_limited": 429}.get(exc.code, 502)
+            return HTTPException(status, exc.code)
         if isinstance(exc, CryptoError):
             return HTTPException(401, "wrong username or passphrase")
         if isinstance(exc, ProtocolError):
@@ -119,6 +122,10 @@ def create_ui(
 
     @app.post("/api/unlock")
     async def unlock(body: UnlockBody) -> dict[str, Any]:
+        if client.state is not None:
+            # Re-unlocking would reload state and replace the live relay connection, dropping
+            # in-flight requests, or swap identities (ZAP finding, M8).
+            raise HTTPException(409, "already unlocked")
         try:
             client.unlock(body.username, body.passphrase)
             await client.connect()
