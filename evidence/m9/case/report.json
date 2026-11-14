@@ -1,0 +1,136 @@
+{
+  "custody": [
+    {
+      "source": "/tmp/tmpzorgnjys/relay/relay.db",
+      "image": "image/relay.db",
+      "bytes": 942080,
+      "sha256_source": "affeee5584dcc73351c5f152e14387b94496b763213738d35d2f8afcc55b941c",
+      "sha256_image": "affeee5584dcc73351c5f152e14387b94496b763213738d35d2f8afcc55b941c",
+      "verified": true,
+      "acquired_utc": "2026-11-14T12:18:38+00:00"
+    },
+    {
+      "source": "/tmp/tmpzorgnjys/alice/keystore.pqks",
+      "image": "image/alice/keystore.pqks",
+      "bytes": 837263,
+      "sha256_source": "026ebf9c52057c805e55d1cb3f71d11469d78def8cc6ce33cefa59f3216095cd",
+      "sha256_image": "026ebf9c52057c805e55d1cb3f71d11469d78def8cc6ce33cefa59f3216095cd",
+      "verified": true,
+      "acquired_utc": "2026-11-14T12:18:38+00:00"
+    },
+    {
+      "source": "/tmp/tmpzorgnjys/bob/keystore.pqks",
+      "image": "image/bob/keystore.pqks",
+      "bytes": 821685,
+      "sha256_source": "9a507aa7b6574966053942c3ccd8d6bbdf899d5397f9b0efb55d02757e66cd05",
+      "sha256_image": "9a507aa7b6574966053942c3ccd8d6bbdf899d5397f9b0efb55d02757e66cd05",
+      "verified": true,
+      "acquired_utc": "2026-11-14T12:18:38+00:00"
+    }
+  ],
+  "all_images_verified": true,
+  "secrets_searched": [
+    "alice_identity_ed25519_private",
+    "alice_identity_mldsa_K",
+    "alice_identity_mldsa_s1_s2_t0",
+    "alice_identity_x25519_private",
+    "alice_session_bob_root_key",
+    "alice_signed_mlkem_dk_pke",
+    "alice_signed_mlkem_z",
+    "bob_identity_ed25519_private",
+    "bob_identity_mldsa_K",
+    "bob_identity_mldsa_s1_s2_t0",
+    "bob_identity_x25519_private",
+    "bob_session_alice_root_key",
+    "bob_signed_mlkem_dk_pke",
+    "bob_signed_mlkem_z",
+    "control_alice_mldsa_public_key",
+    "control_pending_ciphertext",
+    "deleted_ciphertext_0",
+    "deleted_ciphertext_1",
+    "delivered_msg_1",
+    "delivered_msg_2",
+    "passphrase",
+    "pending_msg"
+  ],
+  "encodings": [
+    "raw",
+    "hex",
+    "base64",
+    "base64url"
+  ],
+  "hits": [],
+  "positive_controls_expected": [
+    "control_alice_mldsa_public_key",
+    "control_pending_ciphertext"
+  ],
+  "positive_controls_found": [
+    "control_alice_mldsa_public_key",
+    "control_pending_ciphertext"
+  ],
+  "relay_db": {
+    "tables": {
+      "accounts": {
+        "columns": [
+          "username",
+          "identity",
+          "created_at"
+        ],
+        "rows": 2
+      },
+      "signed_prekeys": {
+        "columns": [
+          "username",
+          "alg",
+          "key_id",
+          "created_at",
+          "expires_at",
+          "blob"
+        ],
+        "rows": 4
+      },
+      "one_time_prekeys": {
+        "columns": [
+          "username",
+          "alg",
+          "key_id",
+          "expires_at",
+          "blob"
+        ],
+        "rows": 198
+      },
+      "queue": {
+        "columns": [
+          "id",
+          "recipient",
+          "sender",
+          "kind",
+          "blob",
+          "created_at",
+          "expires_at"
+        ],
+        "rows": 1
+      },
+      "sqlite_sequence": {
+        "columns": [
+          "name",
+          "seq"
+        ],
+        "rows": 1
+      }
+    },
+    "usernames": [
+      "alice",
+      "bob"
+    ],
+    "queued_messages": [
+      {
+        "recipient": "bob",
+        "sender": "alice",
+        "kind": "msg",
+        "blob_bytes": 323
+      }
+    ],
+    "free_pages": 2
+  }
+}
