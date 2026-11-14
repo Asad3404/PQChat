@@ -3,7 +3,9 @@
 #   * a Bandit high-severity finding,
 #   * a Semgrep error,
 #   * a pip-audit vulnerability,
-#   * (from Milestone 4) a ProVerif query that should hold returning false.
+#   * a ProVerif result that differs from the expected one (formal/run.sh).
+#
+# Third-party actions are pinned to full commit SHAs (SR-32): a moved tag cannot change what runs.
 name: CI
 
 on:
@@ -29,11 +31,11 @@ jobs:
       # Point liboqs-python at our pinned build so it never auto-downloads another one.
       OQS_INSTALL_PATH: ${{ github.workspace }}/.liboqs
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -42,7 +44,7 @@ jobs:
 
       - name: Cache liboqs build
         id: liboqs-cache
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: ${{ env.LIBOQS_PREFIX }}
           key: liboqs-${{ runner.os }}-${{ hashFiles('scripts/install_liboqs.sh') }}
@@ -67,7 +69,7 @@ jobs:
       - name: Pytest with coverage
         run: pytest --cov=pqchat --cov-report=term-missing --cov-report=xml
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: coverage
           path: coverage.xml
@@ -76,11 +78,11 @@ jobs:
     name: Security scans
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
 
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
@@ -112,29 +114,62 @@ jobs:
     runs-on: ubuntu-24.04
     needs: test
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           persist-credentials: false
 
       - name: Build images (runs the ML-KEM self-test during build)
-        run: docker compose --profile client build
+        run: docker compose build
 
-      - name: Start relay and check health
+      - name: Start relay (TLS 1.3) and two clients
         run: |
-          docker compose up -d relay
-          for i in $(seq 1 30); do
+          docker compose up -d
+          for i in $(seq 1 60); do
             status=$(docker inspect -f '{{.State.Health.Status}}' pqchat-relay-1 || true)
             [ "$status" = healthy ] && break
             sleep 2
           done
           test "$status" = healthy
-          curl -fsS http://127.0.0.1:8000/healthz
 
-      - name: Client self-test container
-        run: docker compose run --rm client
+      - name: Smoke checks
+        run: |
+          docker compose exec -T relay python -m pqchat.server.healthcheck   # verifies TLS + certificate
+          docker compose exec -T alice python -m pqchat.selftest
+          for port in 8701 8702; do
+            for i in $(seq 1 30); do curl -fsS -o /dev/null "http://127.0.0.1:$port/" && break; sleep 1; done
+            curl -fsS -o /dev/null "http://127.0.0.1:$port/"
+            # DNS-rebinding defence: a foreign Host header must be refused (421)
+            test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Host: evil.example' "http://127.0.0.1:$port/")" = 421
+          done
 
       - name: Tear down
         if: always()
         run: docker compose down -v
 
-  # formal:  ProVerif job is added in Milestone 4.
+  formal:
+    name: ProVerif (formal/run.sh)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: System packages for ProVerif (its optional GUI needs GTK2 headers)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libgtk2.0-dev bc
+
+      - uses: ocaml/setup-ocaml@ff66428f72b64472e749b22e0ad4dded4b2ddca6 # v3.9.1
+        with:
+          ocaml-compiler: "4.14"
+
+      - name: Install ProVerif 2.05
+        run: opam install -y proverif.2.05
+
+      - name: Run all scenarios and compare with expected results
+        run: opam exec -- formal/run.sh
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: proverif-logs
+          path: formal/out/*.log
