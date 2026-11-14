@@ -1,0 +1,16 @@
+mode,metric,median,p95,runs
+classical,alice_ms,0.8235,0.9006,1000
+classical,bob_ms,0.448,0.5018,1000
+classical,total_ms,1.272,1.3884,1000
+classical,alice_cpu_ms,0.8236,0.8985,1000
+classical,bob_cpu_ms,0.4482,0.4999,1000
+hybrid,alice_ms,1.0401,1.1898,1000
+hybrid,bob_ms,0.5242,0.6235,1000
+hybrid,total_ms,1.5691,1.8208,1000
+hybrid,alice_cpu_ms,1.0403,1.1888,1000
+hybrid,bob_cpu_ms,0.5245,0.6084,1000
+pq_only,alice_ms,0.5344,0.8106,1000
+pq_only,bob_ms,0.3723,0.5654,1000
+pq_only,total_ms,0.8983,1.3926,1000
+pq_only,alice_cpu_ms,0.5336,0.8085,1000
+pq_only,bob_cpu_ms,0.3725,0.5619,1000

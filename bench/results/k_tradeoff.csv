@@ -1,0 +1,6 @@
+K,quantum_attacker_rounds_after_theft,share_with_kem_public_key,share_with_kem_ciphertext,mean_message_bytes,plain_message_bytes
+2,2,0.5,0.985,1993,323
+4,2,0.5,0.495,1458,323
+8,4,0.255,0.25,899,323
+16,8,0.13,0.12,609,323
+32,16,0.07,0.06,472,323

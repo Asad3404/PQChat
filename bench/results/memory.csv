@@ -1,0 +1,5 @@
+mode,python_heap_peak_kib,note
+classical,63.8,Python allocations only; liboqs/OpenSSL C allocations are not traced
+hybrid,68.3,Python allocations only; liboqs/OpenSSL C allocations are not traced
+pq_only,93.9,Python allocations only; liboqs/OpenSSL C allocations are not traced
+process,130420.0,ru_maxrss in KiB for the whole benchmark process
