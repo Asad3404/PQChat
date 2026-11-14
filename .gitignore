@@ -24,3 +24,6 @@ htmlcov/
 .idea/
 .vscode/
 .DS_Store
+
+# Demo video (regenerate: see README "Demo video"); too large for the 1 MB pre-commit limit
+evidence/demo/*.mp4

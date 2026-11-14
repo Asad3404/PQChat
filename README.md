@@ -51,6 +51,24 @@ scripts/demo.sh --down
 The same steps by hand: `docker compose up --build -d`, then
 `docker compose logs alice bob | grep "PQ-Chat UI"` for the links.
 
+**Demo video.** With the demo running, record both browsers and assemble a captioned walkthrough
+(needs Node + Playwright and ffmpeg):
+
+```bash
+node scripts/record_demo.mjs "<alice link>" "<bob link>" demo-out
+```
+
+```bash
+.venv/bin/python scripts/make_demo_video.py demo-out demo-out/relay_view.txt evidence/demo/pqchat-demo.mp4
+```
+
+Before the second command, save the relay's view for the "what the relay stores" card (the
+arguments are texts from the chat, shown to be absent from the database):
+
+```bash
+scripts/relay_view.sh "post-quantum message" "brand-new key" > demo-out/relay_view.txt
+```
+
 ## 2. Development setup (Linux or WSL2)
 
 Ubuntu 24.04 packages:
