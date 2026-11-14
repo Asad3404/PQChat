@@ -1,4 +1,6 @@
-"""PROJECT-BRIEF.md §8: two clients and the relay exchange 1,000 messages, out of order and with loss.
+"""Two clients and the relay exchange 1,000 messages, out of order and with loss.
+
+PROJECT-BRIEF.md §8.
 
 Runs against an in-process relay by default, or against a running Docker Compose relay when
 PQCHAT_RELAY_URL (and PQCHAT_RELAY_CA for wss://) are set, e.g.:

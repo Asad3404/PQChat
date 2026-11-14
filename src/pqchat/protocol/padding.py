@@ -1,4 +1,6 @@
-"""Length hiding: pad plaintext to fixed size buckets before encryption (SR-24, PROJECT-BRIEF.md §5.5).
+"""Length hiding: pad plaintext to fixed size buckets before encryption.
+
+SR-24, PROJECT-BRIEF.md §5.5.
 
 Scheme: ISO/IEC 7816-4 — append one 0x80 byte, then zero bytes up to the bucket size. Unpadding
 strips trailing zeros and requires exactly one 0x80 marker; anything else is rejected. Only the

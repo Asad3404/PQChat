@@ -26,7 +26,7 @@ progress log: [`docs/PROGRESS.md`](docs/PROGRESS.md).
 Needs Docker with the Compose plugin. On Windows use Docker Desktop with WSL2.
 
 ```bash
-git clone <repository-url>
+git clone <repository-url> PQChat
 ```
 
 ```bash

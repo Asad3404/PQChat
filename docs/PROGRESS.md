@@ -8,7 +8,7 @@
 
 **Done:** figures (`docs/figures/`: architecture, key schedule, handshake sequence; generator
 `scripts/make_figures.py`), demo script `scripts/demo.sh` (incl. automated browser run), rewritten
-`README.md`, viva preparation (`docs/thesis-notes/viva-prep.md`, 35 Q&A), results summary
+`README.md`, viva preparation (`docs/thesis-notes/viva-prep.md`, 34 Q&A), results summary
 (`docs/thesis-notes/results-summary.md`), threat model: all 37 requirements Done with evidence, and a
 new traceability check that cited evidence files exist; ADR-003; protocol spec completed.
 **Results:** 314 tests pass, coverage of crypto/ + protocol/ 98 %; demo + browser E2E pass; fresh-clone check: see below.

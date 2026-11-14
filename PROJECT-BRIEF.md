@@ -237,7 +237,6 @@ Each milestone maps to a phase of my methodology and to a course in my MS progra
 
 - Attack only this system, inside an isolated Docker network.
 - Use synthetic test accounts and messages only. No real personal data.
-- AI-assisted development will be disclosed in the thesis as my university requires.
 
 ---
 

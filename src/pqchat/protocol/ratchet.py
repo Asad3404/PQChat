@@ -1,4 +1,6 @@
-"""Double ratchet (Signal spec) with ML-KEM re-keying (PROJECT-BRIEF.md §5.3, docs/notes/m5-pq-ratchet.md).
+"""Double ratchet (Signal spec) with ML-KEM re-keying.
+
+Specified in PROJECT-BRIEF.md §5.3 and docs/notes/m5-pq-ratchet.md.
 
 Message = header || u32 len || AES-256-GCM(message key, plaintext, AD || header)
 
