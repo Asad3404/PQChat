@@ -7,7 +7,7 @@ relay_view.txt is the real database view shown on one card; produce it after the
 
 Structure: title card -> architecture card -> live recording (Alice | Bob side by side, captions
 burned in at the recorded times) -> "what the relay sees" card (real database output) ->
-"proven and tested" card -> closing card. Needs ffmpeg with libfreetype (drawtext).
+"proven and tested" card. Needs ffmpeg with libfreetype (drawtext).
 """
 
 from __future__ import annotations
@@ -172,38 +172,6 @@ def results_card(path: Path) -> Path:
     return save(fig, path)
 
 
-def end_card(path: Path) -> Path:
-    fig, ax = canvas()
-    ax.text(W / 2, 430, "Run it yourself", fontsize=64, weight="bold", color=INK, ha="center")
-    ax.text(
-        W / 2,
-        540,
-        "git clone <repository-url> PQChat",
-        fontsize=30,
-        color=SUB,
-        ha="center",
-        family="DejaVu Sans Mono",
-    )
-    ax.text(
-        W / 2,
-        600,
-        "cd PQChat && scripts/demo.sh",
-        fontsize=30,
-        color=SUB,
-        ha="center",
-        family="DejaVu Sans Mono",
-    )
-    ax.text(
-        W / 2,
-        760,
-        "Then open the two printed links: one for Alice, one for Bob.",
-        fontsize=28,
-        color=SUB,
-        ha="center",
-    )
-    return save(fig, path)
-
-
 def live_background(path: Path) -> Path:
     fig, ax = canvas()
     fig.patch.set_facecolor(PANE)
@@ -339,7 +307,6 @@ def main() -> None:
         live_clip(rec, work, work / "s3.mp4"),
         card_clip(relay_card(work / "c4.png", relay_view.read_text()), 11, work / "s4.mp4"),
         card_clip(results_card(work / "c5.png"), 11, work / "s5.mp4"),
-        card_clip(end_card(work / "c6.png"), 5, work / "s6.mp4"),
     ]
     listing = work / "concat.txt"
     listing.write_text("".join(f"file '{c}'\n" for c in clips))
